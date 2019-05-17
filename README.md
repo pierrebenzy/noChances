@@ -9,4 +9,4 @@ This is a README for our final project in the course CS65 - Smartphone Programmi
 This document will contain information about high-level code management, known issues and instructions about how to download, install and use the app.
 
 ### Progress
-1. DAY 1: Set-up gitlab. Official start of coding.
+1. DAY 1: Set-up gitlab. Official start of coding. Setting up git.
