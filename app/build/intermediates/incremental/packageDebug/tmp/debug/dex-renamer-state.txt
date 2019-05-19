@@ -1,0 +1,7 @@
+#Sun May 19 13:01:10 EDT 2019
+base.0=C\:\\Computer Science and Coding\\CS 65 - Smartphone Programming\\nochances\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\out
+path.1=classes.dex
+renamed.1=classes2.dex
+path.0=classes.dex
+renamed.0=classes.dex
+base.1=C\:\\Computer Science and Coding\\CS 65 - Smartphone Programming\\nochances\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\out
