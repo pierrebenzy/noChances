@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Application Settings">
+        <SwitchPreference
+            android:key="isTrackingEnabled"
+            android:title="Disable Tracking"
+            android:summary="You can disable or enable tracking"/>
+        <ListPreference
+            android:dialogTitle="How far do you want your enemies to stay away from you"
+            android:entries="@array/radius"
+            android:entryValues="@array/radius_values"
+            android:key="radius"
+            android:summary="Select the radius to track enemies"
+            android:title="Radius"
+            android:onClick="listpref"/>
+        <ListPreference
+            android:dialogTitle="How much do you not want to see your enemies"
+            android:entries="@array/general_alarm_level"
+            android:entryValues="@array/general_alarm_level_values"
+            android:key="general_alarm_level"
+            android:summary="general_alarm_level"
+            android:title="general_alarm_level" />
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Account Settings">
+        <PreferenceScreen
+            android:key="signout"
+            android:title="Sign out"/>
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

@@ -1,3 +1,52 @@
 <resources>
     <string name="app_name">nochances</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
+    <string name="sign_in">sign in</string>
+    <string name="register">register</string>
+    <string name="profile">profile</string>
+    <string name="change">change</string>
+    <string name="name">name</string>
+    <string name="female">female</string>
+    <string name="male">male</string>
+    <string name="phone">phone</string>
+    <string name="major">major</string>
+    <string name="ui_profile_photo_picker_title">"Select profile image"</string>
+    <string name="dartmouth_class">dartmouthclass</string>
+    <string-array name="ui_profile_photo_picker_items">
+        <item>Take picture from camera</item>
+        <item>Take picture from gallery</item>
+    </string-array>
+    <string name="profile_photo_file_name">file_name</string>
+    <string name="dialog_fragment_tag_photo_picker">dialog_fragment_photo_picker</string>
+    <string name="sign_up">Sign up</string>
+    <string name="save_entry">save</string>
+    <string-array name="radius">
+        <item>5 feet</item>
+        <item>10 feet</item>
+        <item>15 feet</item>
+        <item>20 feet</item>
+        <item>25 feet</item>
+    </string-array>
+    <string-array name="radius_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+    </string-array>
+    <string-array name="general_alarm_level">
+        <item>green</item>
+        <item>blue</item>
+        <item>yellow</item>
+        <item>orange</item>
+        <item>red</item>
+    </string-array>
+    <string-array name="general_alarm_level_values">
+        <item>green</item>
+        <item>blue</item>
+        <item>yellow</item>
+        <item>orange</item>
+        <item>red</item>
+    </string-array>
 </resources>
