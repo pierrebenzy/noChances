@@ -57,7 +57,7 @@ public class settingsPrefFragment extends PreferenceFragment {
                  String radius_value=preferences.getString(RADIUS,"5");
                 String alarm_level=preferences.getString(GENERAL_ALARM_LEVEL,"green");
                  boolean tracking_enabled=preferences.getBoolean(ENABLE_TRACKING,true);
-
+                //updating the preferences
                 preference_setting_model pref=new preference_setting_model();
                 pref.setAlarm_level(alarm_level);
                 pref.setRadius(radius_value);

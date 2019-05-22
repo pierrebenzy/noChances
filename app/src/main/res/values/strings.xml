@@ -21,6 +21,10 @@
     <string name="dialog_fragment_tag_photo_picker">dialog_fragment_photo_picker</string>
     <string name="sign_up">Sign up</string>
     <string name="save_entry">save</string>
+    <string name="color">color</string>
+    <string name="search_title">search name</string>
+    <string name="enemies">Enemies</string>
+    <string name="users">Users</string>
     <string-array name="radius">
         <item>5 feet</item>
         <item>10 feet</item>
