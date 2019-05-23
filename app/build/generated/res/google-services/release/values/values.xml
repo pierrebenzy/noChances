@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">1031333793875-alj3houc8n2p8qt0h6bs0r86dkh4hrkp.apps.googleusercontent.com</string>
+    <string name="firebase_database_url" translatable="false">https://nochancesthemis.firebaseio.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">1031333793875</string>
+    <string name="google_api_key" translatable="false">AIzaSyCj3vkA-9RsIU-Aj4OkZ8HkNMhLvilDV0Y</string>
+    <string name="google_app_id" translatable="false">1:1031333793875:android:ef3147b4312dcf0e</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCj3vkA-9RsIU-Aj4OkZ8HkNMhLvilDV0Y</string>
+    <string name="google_storage_bucket" translatable="false">nochancesthemis.appspot.com</string>
+    <string name="project_id" translatable="false">nochancesthemis</string>
+</resources>
