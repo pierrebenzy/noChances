@@ -1,7 +1,0 @@
-#Internal package file, do not edit.
-#Thu May 23 12:07:36 EDT 2019
-0.baseType=DIRECTORY
-0.base=C\:\\Computer Science and Coding\\CS 65 - Smartphone Programming\\nochances\\app\\build\\intermediates\\dex\\release\\mergeDexRelease\\out
-0.path=classes.dex
-0.set=DEX
-count=1
