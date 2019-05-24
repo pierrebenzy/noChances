@@ -108,7 +108,7 @@ public class signInActivity extends AppCompatActivity {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 EMAIL = email;
                                 SetUpPreference();
-                                Intent intent = new Intent(signInActivity.this, ListActivity.class);
+                                Intent intent = new Intent(signInActivity.this, MapsActivity.class);
                                 startActivity(intent);
 
                             } else {

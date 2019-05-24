@@ -54,4 +54,5 @@
         <item>red</item>
     </string-array>
     <string name="title_activity_maps">Map</string>
+    <string name="enemieslist">EnemiesList</string>
 </resources>

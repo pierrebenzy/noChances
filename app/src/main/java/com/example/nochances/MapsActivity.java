@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,9 +29,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.nochances.Model.Constants;
 import com.example.nochances.Model.Intents;
 import com.example.nochances.Services.TrackingService;
+import com.example.nochances.utils.constant;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,8 +41,6 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -417,7 +414,7 @@ public class MapsActivity extends AppCompatActivity
                 .center(locationLatLng)
                 .strokeColor(Color.argb(50, 70,70,70))
                 .fillColor( Color.argb(100, 150,150,150) )
-                .radius( Constants.GEOFENCE_RADIUS_IN_METERS );
+                .radius(constant.GEOFENCE_RADIUS_IN_METERS );
         // add the circle to the map!
         geoFenceLimits = mMap.addCircle( circleOptions );
     }

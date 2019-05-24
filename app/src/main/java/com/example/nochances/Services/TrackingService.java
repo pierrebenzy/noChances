@@ -7,7 +7,6 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -23,25 +22,18 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.example.nochances.utils.constant;
-import com.google.android.gms.common.util.Hex;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class TrackingService extends Service {
@@ -350,7 +342,7 @@ public class TrackingService extends Service {
                     String enemyEmail = enemy.getValue(String.class);
                     if (enemyEmail != null) {
                         // use an MD5 hash on the e-mail because that's how we store the profiles!
-                        String enemyID = "users_"+Constants.md5(enemyEmail);
+                        String enemyID = "users_"+ constant.md5(enemyEmail);
                         // go to that enemy's database and try to see their current location
                         DatabaseReference enemyRef = database.getReference(enemyID).child("current_location");
                         enemyRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -365,7 +357,7 @@ public class TrackingService extends Service {
                                     float[] results = new float[5];
                                     Location.distanceBetween(l.getLatitude(), l.getLongitude(),
                                             enemyLatitude, enemyLongitude, results);
-                                    if (results[0] < Constants.GEOFENCE_RADIUS_IN_METERS) {
+                                    if (results[0] < constant.GEOFENCE_RADIUS_IN_METERS) {
                                         // enemy is approaching! Register that!
                                         approachingEnemiesLocations.add(enemyLatitude);
                                         approachingEnemiesLocations.add(enemyLongitude);
