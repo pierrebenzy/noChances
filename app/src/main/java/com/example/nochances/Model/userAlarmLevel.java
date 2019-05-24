@@ -1,4 +1,4 @@
-package com.example.nochances.model;
+package com.example.nochances.Model;
 
 
 public class userAlarmLevel {

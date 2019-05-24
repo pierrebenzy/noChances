@@ -14,7 +14,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.example.nochances.R;
-import com.example.nochances.model.userAlarmLevel;
+import com.example.nochances.Model.userAlarmLevel;
 
 import java.util.ArrayList;
 import java.util.List;

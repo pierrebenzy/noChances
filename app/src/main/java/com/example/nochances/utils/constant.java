@@ -4,6 +4,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class constant {
+    /**
+     * FIELDS: Lots of constants to be used around the app for various utility purposes.
+     * Their functionality is self-explanatory by their name
+     */
+    public static final int GEOFENCE_RADIUS_IN_METERS = 1000000;
+    public static final int GEOFENCE_EXPIRATION_IN_MILLISECONDS = 60000;
+    public static final String GEOFENCE_REQUEST_ID = "NoChances Geofence ID";
+
     public static final String md5(final String s) {
         final String MD5 = "MD5";
         try {

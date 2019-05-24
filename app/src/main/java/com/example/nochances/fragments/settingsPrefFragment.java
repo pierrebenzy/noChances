@@ -12,7 +12,7 @@ import android.preference.PreferenceManager;
 
 
 import com.example.nochances.R;
-import com.example.nochances.model.preference_setting_model;
+import com.example.nochances.Model.preference_setting_model;
 import com.example.nochances.signInActivity;
 import com.example.nochances.utils.constant;
 import com.google.firebase.auth.FirebaseAuth;

@@ -53,4 +53,5 @@
         <item>orange</item>
         <item>red</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
 </resources>

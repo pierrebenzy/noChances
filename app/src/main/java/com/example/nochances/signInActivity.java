@@ -4,7 +4,6 @@ package com.example.nochances;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
-import com.example.nochances.model.preference_setting_model;
+import com.example.nochances.Model.preference_setting_model;
 import com.example.nochances.utils.constant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

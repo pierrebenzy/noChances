@@ -1,4 +1,4 @@
-package com.example.nochances.model;
+package com.example.nochances.Model;
 
 public class preference_setting_model {
     private String radius, alarm_level;

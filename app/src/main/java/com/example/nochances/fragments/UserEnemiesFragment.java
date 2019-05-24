@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 
 import com.example.nochances.R;
 import com.example.nochances.adapter.listAdapter;
-import com.example.nochances.model.userAlarmLevel;
+import com.example.nochances.Model.userAlarmLevel;
 
 import java.util.ArrayList;
 import java.util.List;
