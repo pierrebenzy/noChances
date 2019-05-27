@@ -1,5 +1,6 @@
 package com.example.nochances.fragments;
 
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.Fragment;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -18,38 +19,52 @@ import android.view.View;
 
 import android.view.ViewGroup;
 
+import com.example.nochances.Model.Profile;
 import com.example.nochances.R;
 import com.example.nochances.adapter.AllUserAdapter;
-import com.example.nochances.Model.userAlarmLevel;
+import com.example.nochances.Model.enemiesAlarmLevel;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
+
+import static com.example.nochances.EnemiesProfileActivity.GREEN;
+import static com.example.nochances.EnemiesProfileActivity.enemiesEmailIntent;
+
 // implements a custom ItemClickListener to make easy to implement whatever we want to do when a row is clicked
 public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClickListener,
-        SearchView.OnQueryTextListener {
-    private static final String TAG = com.example.nochances.ListActivity.class.getSimpleName() ;
+        SearchView.OnQueryTextListener{
+    private static final String TAG = AllUserFragment.class.getSimpleName() ;
+    private static final int ALL_Users_LOADER_ID = 1;
     private AllUserAdapter adapter;
-    private List<userAlarmLevel> alarmLevels;// list of name
+    private List<enemiesAlarmLevel> alarmLevels;// list of name
     private int defaultColor;// color of the
     SearchView searchView;// searchView
+    LoaderManager mLoader;
+    DatabaseReference database;
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mLoader = Objects.requireNonNull(getActivity()).getSupportLoaderManager();
         getActivity().setTitle("list of enemies");
+        database= FirebaseDatabase.getInstance().getReference();
         return inflater.inflate(R.layout.enemies_rv_list, container, false);
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)   {
 
         alarmLevels=new ArrayList<>();
-        alarmLevels.add(new userAlarmLevel("Pierre", Color.RED));
-        alarmLevels.add(new userAlarmLevel("Themis",Color.BLUE));
-        alarmLevels.add(new userAlarmLevel("Andrew",Color.BLACK));
 
         RecyclerView recyclerView=view.findViewById(R.id.rvUser);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -69,6 +84,13 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG,"onResume()");
+        updateDatabse();
+
+    }
     /**
      *
      * @param view the current  view
@@ -77,34 +99,11 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
     @Override
     public void onItemClick(View view, int position) {
         Log.d(TAG,"onItemClick position"+ position);
-        //
-        defaultColor=adapter.getItem(position).getColor();// updating default color
-        Log.d(TAG,"defaultColor "+defaultColor);
-        openColorPicker(position);//creates a dialog to allow user to choose color
+
+        startActivity(enemiesEmailIntent(getContext(), AllUserFragment.class.getSimpleName()
+                +","+alarmLevels.get(position).getEmail()+","+alarmLevels.get(position).getName()));
     }
 
-    /**
-     * dialog o choose color
-     * @param position of row selected
-     */
-    private void openColorPicker(final int position) {
-
-        AmbilWarnaDialog colorPicker= new AmbilWarnaDialog(getContext(), defaultColor ,
-                new AmbilWarnaDialog.OnAmbilWarnaListener() {
-                    @Override
-                    public void onCancel(AmbilWarnaDialog dialog) {
-
-                    }
-
-                    @Override
-                    public void onOk(AmbilWarnaDialog dialog, int color) {
-                        defaultColor=color;
-                        adapter.getItem(position).setColor(color);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-        colorPicker.show();
-    }
 
     /**
      * inflating menu
@@ -141,4 +140,38 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
         adapter.getFilter().filter(newText);
         return false;
     }
+    private void updateDatabse(){
+        alarmLevels.clear();
+        database.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Iterator<DataSnapshot> allUsers=dataSnapshot.getChildren().iterator();
+                Log.d(TAG," 1 UserLoader "+dataSnapshot.getValue());
+                for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren()){
+                    Log.d(TAG,"UserLoader "+dataSnapshot1.child("profile").getKey());
+                    Log.d(TAG,"UserLoader "+dataSnapshot1.child("profile").getValue());
+
+                    Profile profile=dataSnapshot1.child("profile").getValue(Profile.class);
+                    Log.d(TAG,"profile "+profile.getEmail());
+                    if(!profile.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
+                        Log.d(TAG,"I am not the current user: "+profile.getEmail());
+                        alarmLevels.add(new enemiesAlarmLevel(profile.getName(), GREEN, profile.getEmail()));
+                    }
+                    Log.d(TAG,"list ");
+                }
+                // list populated
+                // we received info for all users
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG,databaseError.getMessage());
+            }
+        });
+
+    }
+
+
 }

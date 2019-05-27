@@ -55,4 +55,7 @@
     </string-array>
     <string name="title_activity_maps">Map</string>
     <string name="enemieslist">EnemiesList</string>
+    <string name="add">add</string>
+    <string name="delete">delete</string>
+    <string name="instructions">Choose the level of threat of the enemy</string>
 </resources>

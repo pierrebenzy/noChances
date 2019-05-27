@@ -120,7 +120,7 @@ public class Register extends AppCompatActivity {
             signedIn = getIntent().getBooleanExtra(SIGNED_IN, false);
             if (signedIn) {
                 fillInformation();
-                setTitle("profile");
+                setTitle("Profile");
             } else setTitle(R.string.sign_up);
         }
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -141,20 +141,20 @@ public class Register extends AppCompatActivity {
                 String userHash="users_"+ constant.md5(EMAIL);
                 Log.d(TAG,userHash);
 
-                mEmail.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
+                mEmail.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
                         .child("email").getValue()).toString(), TextView.BufferType.NORMAL);
-                PasswordText= Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
+                PasswordText= Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
                         .child("password").getValue()).toString();
                 mPassword.setText(PasswordText, TextView.BufferType.EDITABLE);
-                mName.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
+                mName.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
                         .child("name").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mPhone.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
+                mPhone.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
                         .child("phone Number").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mMajor.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
+                mMajor.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
                         .child("major").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mClass.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
+                mClass.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
                         .child("class").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mGender=Integer.parseInt(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
+                mGender=Integer.parseInt(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
                         .child("gender").getValue()).toString());
                 if(mGender==0) mFemale.setChecked(true);
                 else if(mGender==1)  mMale.setChecked(true);
@@ -316,13 +316,13 @@ public class Register extends AppCompatActivity {
 
         String userHash="users_"+ constant.md5(mEmail.getText().toString());
         Log.d(TAG,"words[0} "+userHash);
-        Database.child(userHash).child("profile").child("email").setValue(mEmail.getText().toString());
-        Database.child(userHash).child("profile").child("name").setValue(mName.getText().toString());
-        Database.child(userHash).child("profile").child("gender").setValue(mGender);
-        Database.child(userHash).child("profile").child("password").setValue(mPassword.getText().toString());
-        Database.child(userHash).child("profile").child("class").setValue(mClass.getText().toString());
-        Database.child(userHash).child("profile").child("major").setValue(mMajor.getText().toString());
-        Database.child(userHash).child("profile").child("phone Number").setValue(mPhone.getText().toString());
+        Database.child(userHash).child("Profile").child("email").setValue(mEmail.getText().toString());
+        Database.child(userHash).child("Profile").child("name").setValue(mName.getText().toString());
+        Database.child(userHash).child("Profile").child("gender").setValue(mGender);
+        Database.child(userHash).child("Profile").child("password").setValue(mPassword.getText().toString());
+        Database.child(userHash).child("Profile").child("class").setValue(mClass.getText().toString());
+        Database.child(userHash).child("Profile").child("major").setValue(mMajor.getText().toString());
+        Database.child(userHash).child("Profile").child("phone Number").setValue(mPhone.getText().toString());
     }
 
 
@@ -357,7 +357,7 @@ public class Register extends AppCompatActivity {
     }
 
     public void onChangePhotoClicked(View v) {
-        // changing the profile image, show the dialog asking the user
+        // changing the Profile image, show the dialog asking the user
         // to choose between taking a picture
         // Go to MyRunsDialogFragment for details.
         Log.d(TAG, "permission recieved:" +permission_recieved);
@@ -427,7 +427,7 @@ public class Register extends AppCompatActivity {
         saveSnap();
         // Making a "toast" informing the user the picture is saved.
         Toast.makeText(getApplicationContext(),
-                "profile Saved",
+                "Profile Saved",
                 Toast.LENGTH_SHORT).show();
         // Close the activity
         finish();
@@ -516,14 +516,14 @@ public class Register extends AppCompatActivity {
     private void loadSnap() {
 
 
-        // Load profile photo from internal storage
+        // Load Profile photo from internal storage
         try {
             FileInputStream fis = openFileInput(getString(R.string.profile_photo_file_name));
             Bitmap bmap = BitmapFactory.decodeStream(fis);
             mImageView.setImageBitmap(bmap);
             fis.close();
         } catch (IOException e) {
-            // Default profile photo if no photo saved before.
+            // Default Profile photo if no photo saved before.
             mImageView.setImageResource(R.drawable.ic_add_a_photo_black_24dp);
         }
     }
@@ -531,7 +531,7 @@ public class Register extends AppCompatActivity {
     private void saveSnap() {
 
         // Commit all the changes into preference_setting_model file
-        // Save profile image into internal storage.
+        // Save Profile image into internal storage.
         mImageView.buildDrawingCache();
         Bitmap bmap = mImageView.getDrawingCache();
         try {

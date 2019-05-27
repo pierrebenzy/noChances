@@ -45,6 +45,7 @@
 
         <activity android:name=".ListActivity" />
         <activity android:name=".settings_activity" />
+        <activity android:name=".EnemiesProfileActivity"/>
         <activity android:name=".signInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

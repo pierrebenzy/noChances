@@ -315,9 +315,9 @@ public class TrackingService extends Service {
      */
     private void uploadLocation(Location location) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = firebaseDatabase.getReference("user_email/current_location");
-        myRef.child("latitude").setValue(location.getLatitude());
-        myRef.child("longitude").setValue(location.getLongitude());
+      //  DatabaseReference myRef = firebaseDatabase.getReference("user_email/current_location");
+       // myRef.child("latitude").setValue(location.getLatitude());
+       // myRef.child("longitude").setValue(location.getLongitude());
     }
 
     /**

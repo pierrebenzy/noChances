@@ -14,18 +14,18 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.example.nochances.R;
-import com.example.nochances.Model.userAlarmLevel;
+import com.example.nochances.Model.enemiesAlarmLevel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.ViewHolder> implements Filterable {
-    private List<userAlarmLevel> mData;//full Data
-    private  List<userAlarmLevel> mDisplayedData;//Data to be displayed
+    private List<enemiesAlarmLevel> mData;//full Data
+    private  List<enemiesAlarmLevel> mDisplayedData;//Data to be displayed
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public AllUserAdapter(Context context,List<userAlarmLevel> data){
+    public AllUserAdapter(Context context,List<enemiesAlarmLevel> data){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         this.mDisplayedData=data;
@@ -63,7 +63,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.ViewHold
      * @param id of the item
      * @return the item
      */
-    public userAlarmLevel getItem(int id) {
+    public enemiesAlarmLevel getItem(int id) {
         return mDisplayedData.get(id);
     }
 
@@ -83,7 +83,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.ViewHold
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
                 FilterResults results = new FilterResults();        // Holds the results of a filtering operation in values
-                List<userAlarmLevel> FilteredArrList = new ArrayList<>();
+                List<enemiesAlarmLevel> FilteredArrList = new ArrayList<>();
                 if (mData == null) {
                     mData = new ArrayList<>(mDisplayedData); // saves the original data in mOriginalValues
                 }
@@ -104,8 +104,8 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.ViewHold
                     for (int i = 0; i < mData.size(); i++) {
                         String data = mData.get(i).getName();
                         if (data.toLowerCase().startsWith(charSequence.toString())) {
-                            FilteredArrList.add(new userAlarmLevel(
-                                    mData.get(i).getName(),mData.get(i).getColor()));
+                            FilteredArrList.add(new enemiesAlarmLevel(
+                                    mData.get(i).getName(),mData.get(i).getColor(),mData.get(i).getEmail()));
                         }
                     }
                     // set the Filtered result to return
@@ -119,7 +119,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.ViewHold
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mDisplayedData=(List<userAlarmLevel>)filterResults.values;
+                mDisplayedData=(List<enemiesAlarmLevel>)filterResults.values;
                 notifyDataSetChanged();
             }
         };

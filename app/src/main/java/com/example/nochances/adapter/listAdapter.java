@@ -15,18 +15,25 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.example.nochances.R;
-import com.example.nochances.Model.userAlarmLevel;
+import com.example.nochances.Model.enemiesAlarmLevel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.nochances.EnemiesProfileActivity.BLUE;
+import static com.example.nochances.EnemiesProfileActivity.GREEN;
+import static com.example.nochances.EnemiesProfileActivity.ORANGE;
+import static com.example.nochances.EnemiesProfileActivity.RED;
+import static com.example.nochances.EnemiesProfileActivity.YELLOW;
+
 public class listAdapter extends RecyclerView.Adapter<listAdapter.ViewHolder> implements Filterable {
-    private List<userAlarmLevel> mData;
-    private  List<userAlarmLevel> mDisplayedData;
+
+    private List<enemiesAlarmLevel> mData;
+    private  List<enemiesAlarmLevel> mDisplayedData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public listAdapter(Context context,List<userAlarmLevel> data){
+    public listAdapter(Context context,List<enemiesAlarmLevel> data){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         this.mDisplayedData=data;
@@ -45,7 +52,25 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ViewHolder> im
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String name=mDisplayedData.get(position).getName();
         holder.userName.setText(name);
-        holder.alarmLevel.setTextColor(mData.get(position).getColor());
+        int color=R.color.green;
+        switch (mData.get(position).getColor()) {
+            case GREEN:
+                color = R.color.green;
+                break;
+            case BLUE:
+                color = R.color.blue;
+                break;
+            case YELLOW:
+                color = R.color.yellow;
+                break;
+            case ORANGE:
+                color = R.color.orange;
+                break;
+            case RED:
+                color = R.color.red;
+                break;
+        }
+        holder.alarmLevel.setTextColor(color);
 
     }
 
@@ -53,7 +78,7 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ViewHolder> im
     public int getItemCount() {
         return mDisplayedData.size();
     }
-    public userAlarmLevel getItem(int id) {
+    public enemiesAlarmLevel getItem(int id) {
         return mDisplayedData.get(id);
     }
 
@@ -69,7 +94,7 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ViewHolder> im
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
                 FilterResults results = new FilterResults();        // Holds the results of a filtering operation in values
-               List<userAlarmLevel> FilteredArrList = new ArrayList<>();
+               List<enemiesAlarmLevel> FilteredArrList = new ArrayList<>();
                 if (mData == null) {
                     mData = new ArrayList<>(mDisplayedData); // saves the original data in mOriginalValues
                 }
@@ -89,8 +114,8 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ViewHolder> im
                     for (int i = 0; i < mData.size(); i++) {
                         String data = mData.get(i).getName();
                         if (data.toLowerCase().startsWith(charSequence.toString())) {
-                            FilteredArrList.add(new userAlarmLevel(
-                                    mData.get(i).getName(),mData.get(i).getColor()));
+                            FilteredArrList.add(new enemiesAlarmLevel(
+                                    mData.get(i).getName(),mData.get(i).getColor(),mData.get(i).getEmail()));
                         }
                     }
                     // set the Filtered result to return
@@ -103,7 +128,7 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ViewHolder> im
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mDisplayedData=(List<userAlarmLevel>)filterResults.values;
+                mDisplayedData=(List<enemiesAlarmLevel>)filterResults.values;
                 notifyDataSetChanged();
             }
         };

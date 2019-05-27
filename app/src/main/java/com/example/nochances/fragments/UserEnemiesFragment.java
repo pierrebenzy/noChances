@@ -1,7 +1,6 @@
 package com.example.nochances.fragments;
 
 import android.support.v4.app.Fragment;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
@@ -20,20 +19,31 @@ import android.view.ViewGroup;
 
 import com.example.nochances.R;
 import com.example.nochances.adapter.listAdapter;
-import com.example.nochances.Model.userAlarmLevel;
+import com.example.nochances.Model.enemiesAlarmLevel;
+import com.example.nochances.utils.constant;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
+import static com.example.nochances.EnemiesProfileActivity.GREEN;
+import static com.example.nochances.EnemiesProfileActivity.enemiesEmailIntent;
+
 public class UserEnemiesFragment extends Fragment implements listAdapter.ItemClickListener,
         SearchView.OnQueryTextListener {
-    private static final String TAG = com.example.nochances.ListActivity.class.getSimpleName() ;
+    private static final String TAG = UserEnemiesFragment.class.getSimpleName() ;
     private listAdapter adapter;
-    private List<userAlarmLevel> alarmLevels;// list of name to be deiplayed
+    private List<enemiesAlarmLevel> alarmLevels;// list of name to be deiplayed
     private int defaultColor;
     SearchView searchView;
+    private DatabaseReference database;
 
 
     @Nullable
@@ -47,10 +57,8 @@ public class UserEnemiesFragment extends Fragment implements listAdapter.ItemCli
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)   {
 
         alarmLevels=new ArrayList<>();
-        alarmLevels.add(new userAlarmLevel("Pierre", Color.RED));
-        alarmLevels.add(new userAlarmLevel("Themis",Color.BLUE));
-        alarmLevels.add(new userAlarmLevel("Andrew",Color.BLACK));
 
+        database= FirebaseDatabase.getInstance().getReference();
         RecyclerView recyclerView=view.findViewById(R.id.rvUser);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter= new listAdapter(getContext(), alarmLevels);
@@ -79,33 +87,11 @@ public class UserEnemiesFragment extends Fragment implements listAdapter.ItemCli
     @Override
     public void onItemClick(View view, int position) {
         Log.d(TAG,"onItemClick position"+ position);
-        defaultColor=adapter.getItem(position).getColor();// updating default color
-        Log.d(TAG,"defaultColor "+defaultColor);
-        openColorPicker(position);//creates a dialog to allow user to choose color
+        startActivity(enemiesEmailIntent(getContext(), UserEnemiesFragment.class.getSimpleName()
+                +","+alarmLevels.get(position).getEmail()+","+alarmLevels.get(position).getName()));
     }
 
 
-    /**
-     * dialog o choose color
-     * @param position of row selected
-     */
-    private void openColorPicker(final int position) {
-        AmbilWarnaDialog colorPicker= new AmbilWarnaDialog(getContext(), defaultColor ,
-                new AmbilWarnaDialog.OnAmbilWarnaListener() {
-                    @Override
-                    public void onCancel(AmbilWarnaDialog dialog) {
-
-                    }
-
-                    @Override
-                    public void onOk(AmbilWarnaDialog dialog, int color) {
-                        defaultColor=color;
-                        adapter.getItem(position).setColor(color);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-        colorPicker.show();
-    }
 
     /**
      * inflating menu
@@ -142,4 +128,41 @@ public class UserEnemiesFragment extends Fragment implements listAdapter.ItemCli
         adapter.getFilter().filter(newText);
         return false;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        populateList();
+    }
+
+    private void populateList(){
+        // clear everytime resume is called because we are going to read everything again
+        alarmLevels.clear();
+        String email=FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        database.child("users_"+ constant.md5(email)).child("enemies_list").
+                addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //read every children
+                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()) {
+                    /*create a "fake enenemy that is deleted so if the user has no enemies (dataSnapshot1=null)
+                      then the enemy doesn't get added
+                     */
+                    enemiesAlarmLevel userAlarmLevel=new enemiesAlarmLevel("name",GREEN,"email",true);
+                    if(dataSnapshot1!=null)
+                        userAlarmLevel = dataSnapshot1.getValue(enemiesAlarmLevel.class);
+                if(!userAlarmLevel.isDeleted()) alarmLevels.add(userAlarmLevel);
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG,databaseError.getMessage());
+            }
+        });
+
+    }
+
 }
