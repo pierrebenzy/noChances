@@ -14,13 +14,17 @@
 
         <ImageView
             android:id="@+id/imageProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="125dp"
+            android:layout_height="141dp"
             android:layout_gravity="center_horizontal"
-            android:paddingTop="30dp"
-            android:padding="@dimen/fab_margin"
             android:contentDescription="@string/profile"
+<<<<<<< HEAD
             app:srcCompat="@drawable/jim2" />
+=======
+            android:padding="@dimen/fab_margin"
+            android:paddingTop="30dp"
+            app:srcCompat="@drawable/ic_launcher_round" />
+>>>>>>> 93a26b1d0596023dde04713a81e13ffb32b72343
 
 
         <LinearLayout
@@ -34,6 +38,8 @@
                 android:layout_gravity="center"
                 android:layout_margin="10dp"
                 android:padding="@dimen/fab_margin"
+                android:textStyle="normal|bold"
+                android:textSize="25sp"
                 />
 
             <com.example.nochances.utils.CustomSeekBar
@@ -65,7 +71,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
-                    android:padding="@dimen/fab_margin"/>
+                    android:padding="@dimen/fab_margin"
+                    android:textStyle="normal|bold"
+                    android:textSize="25sp"/>
 
 
                 <TextView
@@ -74,7 +82,9 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/email"
                     android:layout_margin="16dp"
-                    android:padding="@dimen/fab_margin"/>
+                    android:padding="@dimen/fab_margin"
+                    android:textStyle="normal|bold"
+                    android:textSize="25sp"/>
 
 
 
@@ -85,7 +95,9 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/major"
                     android:layout_margin="@dimen/fab_margin"
-                   android:padding="@dimen/fab_margin"/>
+                   android:padding="@dimen/fab_margin"
+                   android:textStyle="normal|bold"
+                   android:textSize="25sp"/>
 
 
         </LinearLayout>

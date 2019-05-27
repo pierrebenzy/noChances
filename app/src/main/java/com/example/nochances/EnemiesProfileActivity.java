@@ -57,15 +57,6 @@ public class EnemiesProfileActivity extends AppCompatActivity {
     int selectedColor;   // id of colors in drawable
     String enemyName;      //the name of the enemy
     private String ColorSelectedString;//the color string that will be saved
-    //will use to calculate percentage of color in seekbar
-    private float totalSpan = 1500;
-    private float greenSpan = 300;//
-    private float blueSpan = 300;
-    private float  yellowSpan= 300;
-    private float orangeSpan = 300;
-    private float redSpan=300;
-    private ArrayList<ProgressItem> progressItemList;
-    private ProgressItem mProgressItem;
 
 
     @Override
@@ -132,10 +123,7 @@ public class EnemiesProfileActivity extends AppCompatActivity {
                 mMajor.setText(profile.getMajor(), TextView.BufferType.EDITABLE);
                 //mClass.setText(profile.getDartClass(), TextView.BufferType.EDITABLE);
 
-                mEmail.setEnabled(false);
-                mName.setEnabled(false);
-                mMajor.setEnabled(false);
-                
+
                 // ...
                 Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
             }
@@ -168,6 +156,7 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         if(id==R.id.add){
            // registerUser();
             saveEnemy();
+            finish();
             return true;
         }
         else if(id==android.R.id.home){
@@ -176,6 +165,7 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         }
         else if(id==R.id.delete){
            deleteEnemy();
+           finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -188,7 +178,8 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         String emailHash=constant.md5(FirebaseAuth.getInstance().getCurrentUser().getEmail());
         //enemies_state is a model that contains the enemy Email, color, is it deleted?
         database.child("users_"+emailHash).child("enemies_list").child(constant.md5(enemyEmail)).child("deleted").setValue(true);
-
+         Toast.makeText(EnemiesProfileActivity.this,"enemy successfully deleted",
+                 Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -266,30 +257,38 @@ public class EnemiesProfileActivity extends AppCompatActivity {
      * setting up the seekbar with the different custom colors
      */
     private void initDataToSeekbar() {
-        progressItemList = new ArrayList<>();
+        ArrayList<ProgressItem> progressItemList = new ArrayList<>();
         // red span
-        mProgressItem = new ProgressItem();
+        ProgressItem mProgressItem = new ProgressItem();
+        //will use to calculate percentage of color in seekbar
+        float totalSpan = 1500;
+        //
+        float greenSpan = 300;
         mProgressItem.progressItemPercentage = ((greenSpan / totalSpan) * 100);
         Log.i("Mainactivity", mProgressItem.progressItemPercentage + "");
         mProgressItem.color = R.color.green;
         progressItemList.add(mProgressItem);
         // blue span
         mProgressItem = new ProgressItem();
+        float blueSpan = 300;
         mProgressItem.progressItemPercentage = (blueSpan / totalSpan) * 100;
         mProgressItem.color = R.color.blue;
         progressItemList.add(mProgressItem);
         // green span
         mProgressItem = new ProgressItem();
+        float yellowSpan = 300;
         mProgressItem.progressItemPercentage = (yellowSpan / totalSpan) * 100;
         mProgressItem.color = R.color.yellow;
         progressItemList.add(mProgressItem);
         // yellow span
         mProgressItem = new ProgressItem();
+        float orangeSpan = 300;
         mProgressItem.progressItemPercentage = (orangeSpan / totalSpan) * 100;
         mProgressItem.color = R.color.orange;
         progressItemList.add(mProgressItem);
         // greyspan
         mProgressItem = new ProgressItem();
+        float redSpan = 300;
         mProgressItem.progressItemPercentage = (redSpan / totalSpan) * 100;
         mProgressItem.color = R.color.red;
         progressItemList.add(mProgressItem);
