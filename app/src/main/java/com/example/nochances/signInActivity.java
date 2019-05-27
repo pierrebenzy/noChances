@@ -2,6 +2,9 @@ package com.example.nochances;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -57,7 +60,16 @@ public class signInActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.password_sign_in);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+
+        Button test = findViewById(R.id.test);
+        test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
     }
+
+
 
     @Override
     protected void onPostResume() {

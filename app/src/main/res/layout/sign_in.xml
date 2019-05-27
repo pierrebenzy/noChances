@@ -51,4 +51,9 @@
         android:text="@string/register"
         android:onClick="StartRegister_activity"
         tools:text="Register" />
+
+    <Button
+        android:id="@+id/test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

@@ -20,7 +20,7 @@
             android:paddingTop="30dp"
             android:padding="@dimen/fab_margin"
             android:contentDescription="@string/profile"
-            app:srcCompat="@drawable/ic_launcher_round" />
+            app:srcCompat="@drawable/jim2" />
 
 
         <LinearLayout
