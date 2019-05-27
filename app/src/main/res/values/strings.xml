@@ -55,4 +55,6 @@
     </string-array>
     <string name="title_activity_maps">Map</string>
     <string name="enemieslist">EnemiesList</string>
+    <string name="swipe_to_answer_call">Swipe to answer call</string>
+    <string name="fake_caller">Fake caller!</string>
 </resources>
