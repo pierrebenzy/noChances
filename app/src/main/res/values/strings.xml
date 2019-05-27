@@ -58,4 +58,6 @@
     <string name="add">add</string>
     <string name="delete">delete</string>
     <string name="instructions">Choose the level of threat of the enemy</string>
+    <string name="swipe_to_answer_call">Swipe to answer call</string>
+    <string name="fake_caller">Fake caller!</string>
 </resources>

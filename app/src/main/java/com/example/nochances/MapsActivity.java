@@ -1,6 +1,7 @@
 package com.example.nochances;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,15 +12,21 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -41,8 +48,16 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback {
@@ -62,6 +77,13 @@ public class MapsActivity extends AppCompatActivity
      *  10. waitingForSuccessfulUnregistering: are we waiting for a signal from the TrackingService
      *  that this Activity has unbounded so we can retry bounding to it?
      *  11. enemyMarkers: an arraylist of markers that will signify the enemies
+     *  12. circleColor: the color of the inside of the circle, to be decided by the user's
+     *  set generalAlarmLevel and the average of the alarm levels of the enemies
+     *  13. collectiveAlarmLevel: the average of the alarm levels of the approaching enemies
+     *  14. hasVibratedForOuterCircle: has the phone vibrated because of a violation of
+     *  the general alarm level threshold?
+     *  15. middleCircle: the middle circle in the map
+     *  16. innerCircle: the inner circle in the map
      */
     private static final int LOCATION_PERMISSION_ACCESS = 1;
     private static final String TAG = "TagMapsActivity";
@@ -107,14 +129,19 @@ public class MapsActivity extends AppCompatActivity
     private boolean isBound = false;
     private boolean waitingForSuccessfulUnregistering = false;
     private ArrayList<Marker> enemyMarkers = new ArrayList<>();
+    private int circleColor;
+    private int collectiveAlarmLevel;
+    private boolean hasVibratedForOuterCircle;
+    private Circle middleCircle, innerCircle;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle(R.string.title_activity_maps);
 
@@ -122,6 +149,9 @@ public class MapsActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // initially, the phone has not vibrated!
+        hasVibratedForOuterCircle = false;
 
         // check if we have permissions for location access and if not request them.
         checkPermissions();
@@ -149,6 +179,7 @@ public class MapsActivity extends AppCompatActivity
      * Activity Lifecycle method.
      * Invoking getCurrentLocation to focus on the user's current whereabouts!
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume()");
@@ -161,7 +192,7 @@ public class MapsActivity extends AppCompatActivity
                 == PackageManager.PERMISSION_GRANTED) {
             // start the TrackingService if it isn't running alraedy
             if (!TrackingService.isRunning) {
-                startService(new Intent(MapsActivity.this, TrackingService.class));
+                startForegroundService(new Intent(MapsActivity.this, TrackingService.class));
             }
             // bind to the TrackingService
             if (!waitingForSuccessfulUnregistering) {
@@ -200,6 +231,7 @@ public class MapsActivity extends AppCompatActivity
      * Check for permissions (location permissions)
      * If these aren't granted, request them!
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(MapsActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -212,7 +244,7 @@ public class MapsActivity extends AppCompatActivity
         } else {
             // start the TrackingService if it isn't running alraedy
             if(!TrackingService.isRunning) {
-                startService(new Intent(MapsActivity.this, TrackingService.class));
+                startForegroundService(new Intent(MapsActivity.this, TrackingService.class));
             }
             // bind to the TrackingService
             if(!waitingForSuccessfulUnregistering && !isBound) {
@@ -232,51 +264,52 @@ public class MapsActivity extends AppCompatActivity
      * @param permissions: a list of strings representing the permissions we asked for
      * @param grantResults: a list of outcomes, whether the permissions have been granted or not
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case LOCATION_PERMISSION_ACCESS: {
-                if(grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        // the permission has been granted! We have access to location!
-                        Toast toast = Toast.makeText(this,
-                                "Permissions Granted!",
-                                Toast.LENGTH_LONG);
-                        toast.show();
-                        // show a relevant toast!
-                        Log.d(TAG, "Permissions granted!");
-                        // first, get the current location and point the map there, so that even
-                        // if something goes wrong in the Service machinery, the user will just still
-                        // see where they are in the map and just that!
-                        getCurrentLocation();
-                        // start the TrackingService if the service isn't already running!
-                        if(!TrackingService.isRunning) {
-                            startService(new Intent(MapsActivity.this, TrackingService.class));
-                        }
-                        // bind to the TrackingService
-                        if(!waitingForSuccessfulUnregistering && !isBound) {
-                            // we can only attempt binding if we are NOT waiting to for
-                            // a message of successful unregistering / unbinding AND
-                            // if we haven't bound to the service already!
-                            bindService(new Intent(MapsActivity.this, TrackingService.class),
-                                    mConnection, Context.BIND_AUTO_CREATE);
-                            isBound = true; // we are now bound to the service!
-                        }
+        if (requestCode == LOCATION_PERMISSION_ACCESS) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    // the permission has been granted! We have access to location!
+                    Toast toast = Toast.makeText(this,
+                            "Permissions Granted!",
+                            Toast.LENGTH_LONG);
+                    toast.show();
+                    // show a relevant toast!
+                    Log.d(TAG, "Permissions granted!");
+                    // first, get the current location and point the map there, so that even
+                    // if something goes wrong in the Service machinery, the user will just still
+                    // see where they are in the map and just that!
+                    getCurrentLocation();
+                    // start the TrackingService if the service isn't already running!
+                    if (!TrackingService.isRunning) {
+                        // TODO: Make sure to call StopForeground somehow! Then we'll see if
+                        // TODO: the notification changes to what we want!
+                        startForegroundService(new Intent(MapsActivity.this, TrackingService.class));
                     }
-                } else {
-                    // we didn't get the permissions!
-                    // show a relevant toast
-                    Toast.makeText(MapsActivity.this,
-                            "Permissions Denied!",
-                            Toast.LENGTH_LONG).show();
-                    // has the user clicked on the "Don't show again" button?
-                    boolean showRationale = ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this,
-                            Manifest.permission.ACCESS_FINE_LOCATION);
-                    if(!showRationale) {
-                        openSettingsDialog();
+                    // bind to the TrackingService
+                    if (!waitingForSuccessfulUnregistering && !isBound) {
+                        // we can only attempt binding if we are NOT waiting to for
+                        // a message of successful unregistering / unbinding AND
+                        // if we haven't bound to the service already!
+                        bindService(new Intent(MapsActivity.this, TrackingService.class),
+                                mConnection, Context.BIND_AUTO_CREATE);
+                        isBound = true; // we are now bound to the service!
                     }
+                }
+            } else {
+                // we didn't get the permissions!
+                // show a relevant toast
+                Toast.makeText(MapsActivity.this,
+                        "Permissions Denied!",
+                        Toast.LENGTH_LONG).show();
+                // has the user clicked on the "Don't show again" button?
+                boolean showRationale = ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+                if (!showRationale) {
+                    openSettingsDialog();
                 }
             }
             /*
@@ -368,9 +401,11 @@ public class MapsActivity extends AppCompatActivity
 
                 // get the user's current (last known) location and update the map
                 Location current_location = locationManager.getLastKnownLocation(provider);
-                LatLng current_lat_lng = new LatLng(current_location.getLatitude(),
-                        current_location.getLongitude());
-                updateMap(current_lat_lng);
+                if(current_location != null) {
+                    LatLng current_lat_lng = new LatLng(current_location.getLatitude(),
+                            current_location.getLongitude());
+                    updateMap(current_lat_lng);
+                }
             } else {
                 // issue a warning
                 Log.w(TAG, "The location manager is null!");
@@ -391,7 +426,7 @@ public class MapsActivity extends AppCompatActivity
             }
             userCurrPosMarker = mMap.addMarker(new MarkerOptions().position(curr_loc).title("You are here!"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(curr_loc));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curr_loc, 9));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curr_loc, 18));
         }
         drawGeofence(curr_loc);
     }
@@ -409,14 +444,40 @@ public class MapsActivity extends AppCompatActivity
         if ( geoFenceLimits != null )
             geoFenceLimits.remove();
 
-        // make a circle with some parameters
-        CircleOptions circleOptions = new CircleOptions()
+        // make the OUTER circle
+        // the outer circle color is decided by how many enemies are in the circle,
+        // what their alarm levels are and what is the user's general alarm level...
+        CircleOptions OuterCircleOptions = new CircleOptions()
                 .center(locationLatLng)
                 .strokeColor(Color.argb(50, 70,70,70))
-                .fillColor( Color.argb(100, 150,150,150) )
+                .fillColor(circleColor)
                 .radius(constant.GEOFENCE_RADIUS_IN_METERS );
+        // TODO: modify strokeColor a bit too!
         // add the circle to the map!
-        geoFenceLimits = mMap.addCircle( circleOptions );
+        geoFenceLimits = mMap.addCircle( OuterCircleOptions );
+
+
+        // add the middle and inner circles on the map!
+        if( middleCircle != null)
+            middleCircle.remove();
+
+        CircleOptions MiddleCircleOptions = new CircleOptions()
+                .center(locationLatLng)
+                .strokeColor(Color.rgb(0,0,0))
+                .fillColor(circleColor)
+                .radius(constant.INNER_RADIUS_IN_METERS);
+        middleCircle = mMap.addCircle(MiddleCircleOptions);
+
+        if( innerCircle != null)
+            innerCircle.remove();
+
+        CircleOptions PhoneCallCircleOptions = new CircleOptions()
+                .center(locationLatLng)
+                .strokeColor(Color.rgb(0,0,0))
+                .fillColor(circleColor)
+                .radius(constant.PHONE_CALL_RADIUS_IN_METERS);
+        innerCircle = mMap.addCircle(PhoneCallCircleOptions);
+
     }
 
     /**
@@ -445,6 +506,7 @@ public class MapsActivity extends AppCompatActivity
      *      server. Those messages will be:
      *          a. updates on the user's location!
      */
+    @SuppressLint("HandlerLeak")
     private class IncomingMessageHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
@@ -455,14 +517,39 @@ public class MapsActivity extends AppCompatActivity
 
                     // First open the message and get the new location coordinates out of the bundle!
                     double [] newLatLng = msg.getData().getDoubleArray(TrackingService.LOCATION_UPDATE);
+                    // also get a list of the approaching enemies locations
                     double [] approachingEnemiesLocations = msg.getData().getDoubleArray
                             (TrackingService.APPROACHING_ENEMIES);
+                    // get the average of their alarm levels!
+                    collectiveAlarmLevel = msg.getData().getInt(TrackingService.COLLECTIVE_ALARM_LEVEL);
+                    Log.d(TAG, "collectiveAlarmLevel = "+collectiveAlarmLevel);
+                    // see if the collective alarm level exceeds the user's picked general
+                    // alarm level threshold
+                    circleInsideAlarmColor();
+                    // has someone entered the inner circle for the first time?
+                    // TODO: add inner vs outer circle in preferences!
+                    boolean enemyInInnerCircleForTheFirstTime = msg.getData().getBoolean
+                            (TrackingService.INNER_CIRCLE_ENTRY);
+                    // get if an enemy has entered the inner circle for the first time
+                    if(enemyInInnerCircleForTheFirstTime) {
+                        // if so, vibrate the phone!
+                        vibratePhone();
+                    }
                     if(newLatLng != null && newLatLng.length >= 2) {
+                        Log.d(TAG, "about to update map with new location!");
                         // if our array has as much data as we need, we get the coordinates out
                         // and update our map!
                         updateMap(new LatLng(newLatLng[0], newLatLng[1]));
                     }
-                    markApproachingEnemies(approachingEnemiesLocations);
+                    // TODO: for 'official' app, take away this feature maybe
+                    if(approachingEnemiesLocations != null) {
+                        markApproachingEnemies(approachingEnemiesLocations);
+                    }
+                    // do we have to issue a fake phone call?
+                    boolean makePhoneCall = msg.getData().getBoolean(TrackingService.MAKE_PHONE_CALL);
+                    if(makePhoneCall) {
+                        fakeCall();
+                    }
                     break;
                 case TrackingService.MSG_SUCCESSFUL_UNREGISTERING:
                     Log.d(TAG, "received message of successful unregistering!");
@@ -474,6 +561,10 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Puts a marker on the map on the locations of approaching enemies
+     * @param approachingEnemiesLocations: the locations of approaching enemies
+     */
     private void markApproachingEnemies(double [] approachingEnemiesLocations){
         // the size of the enemyLocations array has to be even, as it consists of pairs of latitude
         // and longitude!
@@ -498,5 +589,95 @@ public class MapsActivity extends AppCompatActivity
                     .position(new LatLng(enemyLatitude, enemyLongitude))
                     .title("Enemy")));
         }
+    }
+
+    /**
+     * Figures out what the color of the inside of the circle will be
+     * the first time the general alarm level threshold is violated!
+     * @return: the color the inside of the circle will be painted with.
+     */
+    private void circleInsideAlarmColor() {
+        // get the current user and their e-mail (we are being defensive here)
+        FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
+        if (current_user != null && current_user.getEmail() != null) {
+            // from database, go the the user's preferences are read off
+            // their general alarm level
+            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference settingsRef = firebaseDatabase.getReference("users_" +
+                    constant.md5(current_user.getEmail()) + "/preferences/alarm_level");
+            settingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String generalAlarmLevelStringColor = dataSnapshot.getValue(String.class);
+                    if (generalAlarmLevelStringColor != null) {
+                        // turn the general alarm level color into an integer value
+                        // refer to the documentation of generalAlarmLevelToValue for details
+                        int generalAlarmLevel = constant.generalAlarmLevelToValue
+                                (generalAlarmLevelStringColor);
+
+                        if (generalAlarmLevel == -1) {
+                            // is case something went wrong in feeding the string to
+                            // generalAlarmLevelToValue, then that function will return -1
+                            // and so the color we set the inside of the circle will be grayish.
+                            circleColor = Color.argb(100, 150, 150, 150);
+                        }
+
+                        // the general alarm level acts as a threshold in a reverse way:
+                        // if its, let's say RED, then it has the value 0, so anything
+                        // triggers it. If it's green, then nothing does.
+
+                        // the alarm level of our enemies exceeds our threshold, then we
+                        // have to color the circle the color of that collective alarm level.
+                        if (collectiveAlarmLevel > generalAlarmLevel) {
+                            circleColor = constant.valueToAlarmLevelColor(collectiveAlarmLevel);// if it is the first time we exceed this threshold...
+                            if(!hasVibratedForOuterCircle) {
+                                hasVibratedForOuterCircle = true;
+                            }
+                        } else if(collectiveAlarmLevel == 0) {
+                            // if there are no enemies in the outer circle, then color it green!
+                            circleColor = constant.valueToAlarmLevelColor(1); // green
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    /**
+     * Vibrates the phone when the general alarm level gets breached!
+     */
+    private void vibratePhone(){
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 1000 milliseconds = 1 second
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if(v != null) {
+                v.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+        } else {
+            //deprecated in API 26
+            if(v != null) {
+                v.vibrate(1000);
+            }
+        }
+    }
+
+    /**
+     * Issues a fake call by:
+     *      1) Playing the ringtone.
+     *      2) Sending user to the FakePhoneCall screen
+     */
+    private void fakeCall(){
+        // play ringtone
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        r.play();
+
+        Intent intent = Intents.MapsActivityToFakePhoneCall(MapsActivity.this);
+        startActivity(intent);
     }
 }
