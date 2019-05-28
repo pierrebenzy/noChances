@@ -12,7 +12,7 @@
     <string name="phone">phone</string>
     <string name="major">major</string>
     <string name="ui_profile_photo_picker_title">"Select profile image"</string>
-    <string name="dartmouth_class">dartmouthclass</string>
+    <string name="dartmouth_class">dartmouth class</string>
     <string-array name="ui_profile_photo_picker_items">
         <item>Take picture from camera</item>
         <item>Take picture from gallery</item>
@@ -60,4 +60,7 @@
     <string name="instructions">Choose the level of threat of the enemy</string>
     <string name="swipe_to_answer_call">Swipe to answer call</string>
     <string name="fake_caller">Fake caller!</string>
+    <string name="edit_profile">edit profile</string>
+    <string name="enemy_profile">enemy profile</string>
+    <string name="change_color">Change Color</string>
 </resources>

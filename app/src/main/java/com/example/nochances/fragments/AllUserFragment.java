@@ -1,11 +1,10 @@
 package com.example.nochances.fragments;
 
-import android.support.v4.app.LoaderManager;
-import android.support.v4.app.Fragment;
-import android.graphics.Color;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,13 +15,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.view.ViewGroup;
+import android.widget.Filter;
 
 import com.example.nochances.Model.Profile;
+import com.example.nochances.Model.enemiesAlarmLevel;
 import com.example.nochances.R;
 import com.example.nochances.adapter.AllUserAdapter;
-import com.example.nochances.Model.enemiesAlarmLevel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import yuku.ambilwarna.AmbilWarnaDialog;
-
 import static com.example.nochances.EnemiesProfileActivity.GREEN;
 import static com.example.nochances.EnemiesProfileActivity.enemiesEmailIntent;
 
@@ -43,13 +40,12 @@ import static com.example.nochances.EnemiesProfileActivity.enemiesEmailIntent;
 public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClickListener,
         SearchView.OnQueryTextListener{
     private static final String TAG = AllUserFragment.class.getSimpleName() ;
-    private static final int ALL_Users_LOADER_ID = 1;
     private AllUserAdapter adapter;
-    private List<enemiesAlarmLevel> alarmLevels;// list of name
-    private int defaultColor;// color of the
+   // list of name
     SearchView searchView;// searchView
     LoaderManager mLoader;
     DatabaseReference database;
+    private List<enemiesAlarmLevel> Data;
 
 
     @Nullable
@@ -64,11 +60,12 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)   {
 
-        alarmLevels=new ArrayList<>();
+
+        Data=new ArrayList<>();
 
         RecyclerView recyclerView=view.findViewById(R.id.rvUser);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter= new AllUserAdapter(getContext(), alarmLevels);
+        adapter= new AllUserAdapter(getContext(), Data);
         adapter.setClickListener(this);
         //putting dividers
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
@@ -101,7 +98,7 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
         Log.d(TAG,"onItemClick position"+ position);
 
         startActivity(enemiesEmailIntent(getContext(), AllUserFragment.class.getSimpleName()
-                +","+alarmLevels.get(position).getEmail()+","+alarmLevels.get(position).getName()));
+                +","+adapter.getItem(position).getEmail()+","+adapter.getItem(position).getName()+","+GREEN));
     }
 
 
@@ -141,7 +138,7 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
         return false;
     }
     private void updateDatabse(){
-        alarmLevels.clear();
+        Data.clear();
         database.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
@@ -156,7 +153,7 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
                     Log.d(TAG,"profile "+profile.getEmail());
                     if(!profile.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
                         Log.d(TAG,"I am not the current user: "+profile.getEmail());
-                        alarmLevels.add(new enemiesAlarmLevel(profile.getName(), GREEN, profile.getEmail()));
+                        Data.add(new enemiesAlarmLevel(profile.getName(), GREEN, profile.getEmail()));
                     }
                     Log.d(TAG,"list ");
                 }
@@ -172,6 +169,7 @@ public class AllUserFragment extends Fragment implements AllUserAdapter.ItemClic
         });
 
     }
+
 
 
 }

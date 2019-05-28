@@ -1,13 +1,11 @@
 package com.example.nochances;
 
 
-
-
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,25 +14,27 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.media.ExifInterface;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.example.nochances.utils.constant;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,11 +44,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -60,6 +61,7 @@ public class Register extends AppCompatActivity {
     private static final String SIGNED_IN ="Is_User_signed_in" ;
     private static final int REQUEST_CODE_TAKE_FROM_GALLERY = 1;
     private static final String TAG = Register.class.getSimpleName();
+    private static final String IMAGE_BYTE ="The Image in byte" ;
     EditText mName;
     EditText mEmail;
     EditText mPassword;
@@ -82,7 +84,7 @@ public class Register extends AppCompatActivity {
     private boolean signedIn;
     private FirebaseAuth mAuth;
     DatabaseReference Database;
-
+    private StorageReference storage;
     String EMAIL;
 
 
@@ -108,12 +110,16 @@ public class Register extends AppCompatActivity {
         mMale=findViewById(R.id.male_button);
         mAuth = FirebaseAuth.getInstance();
         Database= FirebaseDatabase.getInstance().getReference();
+        storage=FirebaseStorage.getInstance().getReference();
         checkPermissions();
 
         if (savedInstanceState != null) {
 
             mImageCaptureUri = savedInstanceState.getParcelable(URI_INSTANCE_STATE_KEY);//get uri
             mImageView.setImageURI(mImageCaptureUri);
+            signedIn=savedInstanceState.getBoolean(SIGNED_IN);
+
+           loadSnap();
 
         }
         else {
@@ -136,25 +142,25 @@ public class Register extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                EMAIL=FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                EMAIL= Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
                 assert EMAIL != null;
                 String userHash="users_"+ constant.md5(EMAIL);
                 Log.d(TAG,userHash);
 
-                mEmail.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
+                mEmail.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
                         .child("email").getValue()).toString(), TextView.BufferType.NORMAL);
-                PasswordText= Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
+                PasswordText= Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
                         .child("password").getValue()).toString();
                 mPassword.setText(PasswordText, TextView.BufferType.EDITABLE);
-                mName.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
+                mName.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
                         .child("name").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mPhone.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
+                mPhone.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
                         .child("phone Number").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mMajor.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
+                mMajor.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
                         .child("major").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mClass.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
+                mClass.setText(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
                         .child("class").getValue()).toString(), TextView.BufferType.EDITABLE);
-                mGender=Integer.parseInt(Objects.requireNonNull(dataSnapshot.child(userHash).child("Profile")
+                mGender=Integer.parseInt(Objects.requireNonNull(dataSnapshot.child(userHash).child("profile")
                         .child("gender").getValue()).toString());
                 if(mGender==0) mFemale.setChecked(true);
                 else if(mGender==1)  mMale.setChecked(true);
@@ -198,6 +204,8 @@ public class Register extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(URI_INSTANCE_STATE_KEY, mImageCaptureUri);
+        outState.putBoolean(SIGNED_IN,signedIn);
+
 
     }
 
@@ -316,13 +324,13 @@ public class Register extends AppCompatActivity {
 
         String userHash="users_"+ constant.md5(mEmail.getText().toString());
         Log.d(TAG,"words[0} "+userHash);
-        Database.child(userHash).child("Profile").child("email").setValue(mEmail.getText().toString());
-        Database.child(userHash).child("Profile").child("name").setValue(mName.getText().toString());
-        Database.child(userHash).child("Profile").child("gender").setValue(mGender);
-        Database.child(userHash).child("Profile").child("password").setValue(mPassword.getText().toString());
-        Database.child(userHash).child("Profile").child("class").setValue(mClass.getText().toString());
-        Database.child(userHash).child("Profile").child("major").setValue(mMajor.getText().toString());
-        Database.child(userHash).child("Profile").child("phone Number").setValue(mPhone.getText().toString());
+        Database.child(userHash).child("profile").child("email").setValue(mEmail.getText().toString());
+        Database.child(userHash).child("profile").child("name").setValue(mName.getText().toString());
+        Database.child(userHash).child("profile").child("gender").setValue(mGender);
+        Database.child(userHash).child("profile").child("password").setValue(mPassword.getText().toString());
+        Database.child(userHash).child("profile").child("class").setValue(mClass.getText().toString());
+        Database.child(userHash).child("profile").child("major").setValue(mMajor.getText().toString());
+        Database.child(userHash).child("profile").child("phone Number").setValue(mPhone.getText().toString());
     }
 
 
@@ -487,7 +495,8 @@ public class Register extends AppCompatActivity {
                 // Construct temporary image path and name to save the taken
                 // photo
                 ContentValues values = new ContentValues(1);
-                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
+                //save images as jpeg
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
                 mImageCaptureUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
@@ -507,42 +516,118 @@ public class Register extends AppCompatActivity {
                 Intent intent2 = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent2.setType("image/*");
                 startActivityForResult(intent2,REQUEST_CODE_TAKE_FROM_GALLERY);
+                isTakenFromCamera=false;
 
             default:
                 return;
         }
 
     }
+
+    /**
+     *  Load Profile photo from internal storage, always called when signed in
+     */
     private void loadSnap() {
+        //
+        //take storage reference
 
+        final long ONE_MEGABYTE = 1024 * 1024*10;
+        EMAIL= Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
+        StorageReference fileReference= storage.child("uploads").child(constant.md5(EMAIL) + ".jpg");
 
-        // Load Profile photo from internal storage
-        try {
-            FileInputStream fis = openFileInput(getString(R.string.profile_photo_file_name));
-            Bitmap bmap = BitmapFactory.decodeStream(fis);
-            mImageView.setImageBitmap(bmap);
-            fis.close();
-        } catch (IOException e) {
-            // Default Profile photo if no photo saved before.
-            mImageView.setImageResource(R.drawable.ic_add_a_photo_black_24dp);
-        }
+            fileReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    // Data for "images/island.jpg" is returns, use this as needed
+                    Log.d(TAG, "LoadSnap: success!");
+                    //get bitmap
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    //put it in the image
+                    mImageView.setImageBitmap(bitmap);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d(TAG, "LoadSnap: Failure");
+                }
+            });
     }
 
     private void saveSnap() {
 
         // Commit all the changes into preference_setting_model file
         // Save Profile image into internal storage.
-        mImageView.buildDrawingCache();
-        Bitmap bmap = mImageView.getDrawingCache();
-        try {
-            FileOutputStream fos = openFileOutput(getString(R.string.profile_photo_file_name), MODE_PRIVATE);
-            bmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+        uploadFile();
+
+
     }
+
+    /**
+     * get an extension for a file
+     * for/example.png
+     * should return png
+     * @param uri to get the extension from
+     * @return the extension
+     */
+    private String getFileExtension(Uri uri) {
+        /*
+        if it's taken from camera for some reason cannot get extension
+         */
+        if(isTakenFromCamera){
+            return "jpg";
+        }
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        Log.d(TAG, "contentResolver" +cR.getType(uri));
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    /**
+     * upload picture to firebase amd copy the path to database
+     */
+
+    private void uploadFile() {
+        //make sure there is a picture
+        EMAIL= Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
+            if(mImageCaptureUri!=null){
+                Log.d(TAG,"URI "+mImageCaptureUri);
+                Log.d(TAG, "file extension "+(mImageCaptureUri));
+                //storage under the file of the username
+                final StorageReference fileReference;
+                //if the user is signed in then EMAIL is from signed in and is stored in databse
+                if(signedIn) {
+                    fileReference = storage.child("uploads").child(constant.md5(EMAIL) + "." +
+                            getFileExtension(mImageCaptureUri));
+                }
+                //if not get the email from editText
+                else{
+                    String email=mEmail.getText().toString();
+                    fileReference=storage.child("uploads").child(constant.md5(email)+"."+
+                            getFileExtension(mImageCaptureUri));
+                }
+                //puting file in Database amd call an on success listener
+                fileReference.putFile(mImageCaptureUri).addOnSuccessListener(
+                        new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        //if successful get the url
+                        Log.d(TAG,"successfully saved image to storage");
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(Register.this, e.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            else{
+                Log.d(TAG,"no file selected");
+            }
+
+    }
+
 
     private void beginCrop(Uri source) {
         Uri destination = Uri.fromFile(new File(getCacheDir(), "cropped"));

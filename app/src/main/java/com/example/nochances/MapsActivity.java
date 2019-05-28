@@ -59,6 +59,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.example.nochances.Register.RegisterIntent;
+
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
@@ -374,6 +376,9 @@ public class MapsActivity extends AppCompatActivity
         if(id == android.R.id.home) {
             finish();
             return true;
+        }
+        if(id==R.id.EditProfile){
+            startActivity(RegisterIntent(MapsActivity.this, true));
         }
         return false;
     }

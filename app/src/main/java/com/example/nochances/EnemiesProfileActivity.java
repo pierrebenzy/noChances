@@ -1,8 +1,10 @@
 package com.example.nochances;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -24,6 +25,8 @@ import com.example.nochances.utils.CustomSeekBar;
 import com.example.nochances.utils.ProgressItem;
 import com.example.nochances.utils.constant;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +34,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 import java.util.ArrayList;
@@ -48,6 +53,7 @@ public class EnemiesProfileActivity extends AppCompatActivity {
     TextView mEmail;
     CustomSeekBar seekBar;
     TextView mMajor;
+    TextView mClass;
     TextView instructions;
     private ImageView mImageView;
     DatabaseReference database;
@@ -57,6 +63,7 @@ public class EnemiesProfileActivity extends AppCompatActivity {
     int selectedColor;   // id of colors in drawable
     String enemyName;      //the name of the enemy
     private String ColorSelectedString;//the color string that will be saved
+    private StorageReference storage;
 
 
     @Override
@@ -67,29 +74,60 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         mName=findViewById(R.id.name);
         mEmail=findViewById(R.id.email);
         mMajor=findViewById(R.id.major);
+        mColor=findViewById(R.id.Dartmouth_class);
         mColor=findViewById(R.id.color_textView);
         instructions=findViewById(R.id.AlarmLevel);
         mImageView = findViewById(R.id.imageProfile);
-
+        storage =FirebaseStorage.getInstance().getReference();
         /*
          * getting intents
          * Activity: where it comes from
          * enemyEmail: the email of the enemy selected
          * enemyNAme: the name of the enemy selected
+         * imageUploaded checks if the enmy uploaded a picture
          */
         activity=getIntent().getStringExtra(ENEMY_EMAIL).split(",")[0];
         enemyEmail=getIntent().getStringExtra(ENEMY_EMAIL).split(",")[1];
         enemyName=getIntent().getStringExtra(ENEMY_EMAIL).split(",")[2];
+        String color=getIntent().getStringExtra(ENEMY_EMAIL).split(",")[3];
+        loadSnap();
+
+
         Log.d(TAG,"activity "+ activity);
         Log.d(TAG,"Email "+enemyEmail);
+
         database= FirebaseDatabase.getInstance().getReference();
         selectedColor=R.color.green;
-        ColorSelectedString=GREEN;
+        seekBar.setProgress(150);
+        ColorSelectedString=color;
+        /*
+        putting the seekbar at the right progress and choosing the right selected color
+         */
+        switch (color){
+            case RED:
+                selectedColor=R.color.red;
+                seekBar.setProgress(1400);
+                break;
+            case BLUE:
+                selectedColor=R.color.blue;
+                seekBar.setProgress(500);
+                break;
+            case YELLOW:
+                seekBar.setProgress(700);
+                selectedColor=R.color.yellow;
+                break;
+            case ORANGE:
+                seekBar.setProgress(900);
+                selectedColor=R.color.orange;
+                break;
+        }
         instructions.setText(R.string.instructions);
          mColor.setBackgroundResource(selectedColor);
 
+
         initDataToSeekbar();
-         setColorSeekBar();
+        setColorSeekBar();
+
     }
 
     @Override
@@ -110,6 +148,7 @@ public class EnemiesProfileActivity extends AppCompatActivity {
     public void fillInformation (){
 
         database.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
@@ -118,9 +157,10 @@ public class EnemiesProfileActivity extends AppCompatActivity {
                 Log.d(TAG,userHash);
                 Profile profile=Objects.requireNonNull(dataSnapshot.child(userHash).child("profile").getValue(Profile.class));
                 Log.d(TAG,profile.toString());
-                mEmail.setText(profile.getEmail(), TextView.BufferType.NORMAL);
-                mName.setText(profile.getName(), TextView.BufferType.EDITABLE);
-                mMajor.setText(profile.getMajor(), TextView.BufferType.EDITABLE);
+                mEmail.setText("Email: "+profile.getEmail(), TextView.BufferType.NORMAL);
+                mName.setText("Name: "+profile.getName(), TextView.BufferType.EDITABLE);
+                mMajor.setText("Major: "+profile.getMajor(), TextView.BufferType.EDITABLE);
+               // mClass.setText("Class: "+profile.getDartClass());
                 //mClass.setText(profile.getDartClass(), TextView.BufferType.EDITABLE);
 
 
@@ -155,6 +195,12 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         int id=item.getItemId();
         if(id==R.id.add){
            // registerUser();
+            saveEnemy();
+            finish();
+            return true;
+        }
+        else if(id==R.id.change_color){
+            // registerUser();
             saveEnemy();
             finish();
             return true;
@@ -296,5 +342,34 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         seekBar.initData(progressItemList);
         seekBar.invalidate();
     }
+
+    /**
+     *  Load Profile photo from internal storage, always called when signed in
+     */
+    private void loadSnap() {
+        //
+        //take storage reference
+
+            final long ONE_MEGABYTE = 1024 * 1024 * 10;
+            StorageReference fileReference = storage.child("uploads").child(constant.md5(enemyEmail) + ".jpg");
+
+            fileReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    // Data for "images/island.jpg" is returns, use this as needed
+                    Log.d(TAG, "LoadSnap: success!");
+                    //get bitmap
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    //put it in the image
+                    mImageView.setImageBitmap(bitmap);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d(TAG, "LoadSnap: Failure");
+                }
+            });
+        }
 
 }

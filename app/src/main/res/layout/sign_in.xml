@@ -5,12 +5,15 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/gradient"
     tools:context=".signInActivity">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="200dp"
         app:hintAnimationEnabled="true"
+        android:textColorHint="#ffff"
         >
 
 
@@ -19,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/email"
+            android:textColor="#ffff"
             android:inputType="textEmailAddress"
             />
 
@@ -28,27 +32,35 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:hintAnimationEnabled="true"
+        android:textColorHint="#ffff"
         app:passwordToggleEnabled="true">
         <android.support.design.widget.TextInputEditText
             android:id="@+id/password_sign_in"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="#ffff"
             android:hint="@string/password"
             android:inputType="textPassword" />
     </android.support.design.widget.TextInputLayout>
 
     <Button
+        android:layout_marginTop="20dp"
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sign_in"
+        android:background="@drawable/gradient_button"
+        android:textColor="#ffff"
         android:onClick="SignInAttempt"/>
 
     <Button
+        android:layout_marginTop="20dp"
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/register"
+        android:background="@drawable/gradient_button"
+        android:textColor="#ffff"
         android:onClick="StartRegister_activity"
         tools:text="Register" />
 </LinearLayout>

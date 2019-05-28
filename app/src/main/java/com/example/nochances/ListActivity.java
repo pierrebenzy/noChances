@@ -16,8 +16,7 @@ import android.view.MenuItem;
 
 
 import java.util.ArrayList;
-
-
+import java.util.Objects;
 
 
 public class ListActivity extends AppCompatActivity {
@@ -31,7 +30,7 @@ public class ListActivity extends AppCompatActivity {
         ArrayList<Fragment> fragments;
         ListActivityPagerAdapter viewPagerAdapter;
         setTitle("MainActivity");
-
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         fragments = new ArrayList<>();
         fragments.add(new UserEnemiesFragment());
         fragments.add(new AllUserFragment());
@@ -105,15 +104,11 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-       /* int id=item.getItemId();
-        if(id==R.id.settingsItem){
-            Intent intent= new Intent(this,SettingsActivity.class);
-            startActivity(intent);
-        }
-        //send an data that tells register that the user is signed in
-        if(id==R.id.Profile){
-            startActivity(RegisterIntent(Main_activity.this,true));
-        }*/
+      int id= item.getItemId();
+      if(id==android.R.id.home){
+          finish();
+          return true;
+      }
         return super.onOptionsItemSelected(item);
     }
 }

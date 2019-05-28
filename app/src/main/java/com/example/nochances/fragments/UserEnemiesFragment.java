@@ -17,6 +17,7 @@ import android.view.View;
 
 import android.view.ViewGroup;
 
+import com.example.nochances.Model.Profile;
 import com.example.nochances.R;
 import com.example.nochances.adapter.listAdapter;
 import com.example.nochances.Model.enemiesAlarmLevel;
@@ -87,8 +88,10 @@ public class UserEnemiesFragment extends Fragment implements listAdapter.ItemCli
     @Override
     public void onItemClick(View view, int position) {
         Log.d(TAG,"onItemClick position"+ position);
+
         startActivity(enemiesEmailIntent(getContext(), UserEnemiesFragment.class.getSimpleName()
-                +","+alarmLevels.get(position).getEmail()+","+alarmLevels.get(position).getName()));
+                +","+alarmLevels.get(position).getEmail()+","+alarmLevels.get(position).getName()+","+
+                alarmLevels.get(position).getColor()));
     }
 
 

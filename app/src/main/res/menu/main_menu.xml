@@ -9,5 +9,10 @@
         android:orderInCategory="100"
         android:title="@string/enemieslist"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/EditProfile"
+        android:orderInCategory="100"
+        android:title="@string/edit_profile"
+        app:showAsAction="never" />
 
 </menu>

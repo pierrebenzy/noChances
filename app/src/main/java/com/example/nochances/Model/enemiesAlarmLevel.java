@@ -7,6 +7,7 @@ public class enemiesAlarmLevel {
     private String email;
     private boolean deleted;
 
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -41,6 +42,7 @@ public class enemiesAlarmLevel {
         this.email=email;
         this.deleted=deleted;
     }
+
     public void setColor(String color) {
         this.color = color;
     }

@@ -5,9 +5,12 @@ public class Profile {
     private int gender;
     private String email;
     private String password;
-    private int dartClass;
+    private String dartClass;
     private String major;
     private String phone;
+
+
+
 
     public String getPhone() {
         return phone;
@@ -17,7 +20,7 @@ public class Profile {
         return major;
     }
 
-    public int getDartClass() {
+    public String getDartClass() {
         return dartClass;
     }
 
@@ -47,7 +50,7 @@ public class Profile {
         this.major = major;
     }
 
-    public void setDartClass(int dartClass) {
+    public void setDartClass(String dartClass) {
         this.dartClass = dartClass;
     }
 

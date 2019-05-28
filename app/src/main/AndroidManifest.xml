@@ -8,6 +8,7 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -41,7 +42,8 @@
         <service
             android:name=".Services.TrackingService"
             tools:ignore="InnerclassSeparator" />
-
+        <activity android:name=".Register"
+            android:configChanges="orientation"/>
         <activity android:name=".ListActivity" />
         <activity android:name=".settings_activity" />
         <activity android:name=".EnemiesProfileActivity"/>
@@ -52,7 +54,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Register" />
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
+
     </application>
 
 </manifest>

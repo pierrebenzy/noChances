@@ -45,7 +45,7 @@ public class signInActivity extends AppCompatActivity {
     EditText mPassword;
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
-    public static String EMAIL;
+    public  static String EMAIL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
