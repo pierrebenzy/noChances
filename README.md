@@ -24,3 +24,4 @@ This document will contain information about high-level code management, known i
 
 ### Known Problems
 1. When some enemy gets out of the outer circle, it might take a few iterations of location requests to make it so that the color of the circle changes successfully. During those iterations, maybe the color will be wrong even if the enemy is out of the circle! The reason why this happens is because it takes some time to receive a new location update so the color of the circle remains the same during that time!
+2. Right now, logging out kills the persistent service but leaves some other instance of it open. That instance doesn't do anything other than update locations, so it really is useless. We just cannot find a decent way to kill it yet.

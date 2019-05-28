@@ -16,8 +16,7 @@ import android.view.MenuItem;
 
 
 import java.util.ArrayList;
-
-
+import java.util.Objects;
 
 
 public class ListActivity extends AppCompatActivity {
@@ -27,6 +26,10 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         //initialize fragments
         ArrayList<Fragment> fragments;
         ListActivityPagerAdapter viewPagerAdapter;
@@ -85,8 +88,6 @@ public class ListActivity extends AppCompatActivity {
                 // Code goes here
             }
         });
-
-
     }
 /*
     @Override
@@ -96,24 +97,19 @@ public class ListActivity extends AppCompatActivity {
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
     }
-*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-      //  getMenuInflater().inflate(R.menu.main_activity_menu,menu);
+        // getMenuInflater().inflate(R.menu.main_activity_menu,menu);
         return true;
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-       /* int id=item.getItemId();
-        if(id==R.id.settingsItem){
-            Intent intent= new Intent(this,SettingsActivity.class);
-            startActivity(intent);
+        int id=item.getItemId();
+        if(id == android.R.id.home) {
+            finish();
+            return true;
         }
-        //send an data that tells register that the user is signed in
-        if(id==R.id.Profile){
-            startActivity(RegisterIntent(Main_activity.this,true));
-        }*/
         return super.onOptionsItemSelected(item);
     }
 }

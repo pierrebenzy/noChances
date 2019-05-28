@@ -11,6 +11,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
@@ -27,6 +28,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -35,6 +37,7 @@ import android.util.Log;
 
 import com.example.nochances.FakePhoneCall;
 import com.example.nochances.Model.Intents;
+import com.example.nochances.fragments.settingsPrefFragment;
 import com.example.nochances.utils.constant;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -136,6 +139,13 @@ public class TrackingService extends Service {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
+                if(current_user == null) { // if the user is signed out, kill this service!
+                    stopForeground(true);
+                    stopSelf();
+                } else {
+                    Log.d(TAG, current_user.getEmail());
+                }
                 Log.d(TAG, "location update received!");
                 // when we get a new location, we do three things:
                 //      1) we upload it to the cloud
@@ -201,6 +211,13 @@ public class TrackingService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if(intent.getAction() != null &&
+                intent.getAction().equals(Intents.STOP_FOREGROUND_SERVICE)) {
+            Log.d(TAG, "Signing out. Ending foreground service!");
+            stopForeground(true);
+            stopSelf();
+        }
+
         Log.d(TAG, "onStartCommand()");
         // the service is now running!
         isRunning = true;
@@ -447,7 +464,7 @@ public class TrackingService extends Service {
                                                 enemyLatitude, enemyLongitude, results);
 
                                         // is the enemy inside the outer circle
-                                        if (results[0] < constant.GEOFENCE_RADIUS_IN_METERS) {
+                                        if (results[0] < constant.outerRadiusInMeters(TrackingService.this)) {
                                             // enemy is approaching! Register that!
                                             approachingEnemiesLocations.add(enemyLatitude);
                                             approachingEnemiesLocations.add(enemyLongitude);
@@ -459,7 +476,7 @@ public class TrackingService extends Service {
                                         Boolean enemyWasInInnerCircle = enemyInInner.getValue(Boolean.class);
                                         if(enemyWasInInnerCircle != null) {
                                             // if this enemy is in the inner circle
-                                            if (results[0] < constant.INNER_RADIUS_IN_METERS) {
+                                            if (results[0] < constant.middleRadiusInMeters(TrackingService.this)) {
                                                 // if they just entered the inner circle
                                                 if(!enemyWasInInnerCircle) {
                                                     // also, we know that the phone should vibrate
@@ -477,7 +494,7 @@ public class TrackingService extends Service {
                                         }
 
                                         // did someone new breach our most-inner perimeter?
-                                        if(results[0] < constant.PHONE_CALL_RADIUS_IN_METERS){
+                                        if(results[0] < constant.phoneCallRadiusInMeters(TrackingService.this)){
                                             if(locationUpdatesUntilPhoneCall == 0) {
                                                 phoneCall = true; // make a fake phone call!
                                                 // don't issue more fake phone calls for a while
@@ -529,19 +546,19 @@ public class TrackingService extends Service {
             notificationManager.createNotificationChannel(chan1);
             // make a notification builder for the notification you will display
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder
-                    (getApplicationContext(), CHANNEL_ID)
+                    (this, CHANNEL_ID)
                     .setContentTitle("noChances")
                     .setContentText("This app is tracking your location. You can disable that feature " +
                             "in the settings of log out.");
             // make this a persistent notification!
-            notificationBuilder.setOngoing(true);
+            // notificationBuilder.setOngoing(true);
 
             Intent intent = Intents.NotificationToMapsActivity(this);
 
             notificationBuilder.setContentIntent(PendingIntent.getActivity(
-                    getApplicationContext(),
-                    0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
-            notificationBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
+                    this,
+                    0, intent, 0));
+            // notificationBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
             return notificationBuilder.build();
         }
         return null;
@@ -553,7 +570,10 @@ public class TrackingService extends Service {
      */
     private void fakeCall() {
         // play ringtone
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
+                                                (TrackingService.this);
+        Uri notification = Uri.parse(sharedPreferences.getString
+                                (settingsPrefFragment.RINGTONE_PREFERENCE, "Life's Good"));
         Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
         r.play();
         Intent i = new Intent(this, FakePhoneCall.class);

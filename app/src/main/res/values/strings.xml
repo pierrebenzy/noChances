@@ -25,19 +25,47 @@
     <string name="search_title">search name</string>
     <string name="enemies">Enemies</string>
     <string name="users">Users</string>
-    <string-array name="radius">
-        <item>5 feet</item>
-        <item>10 feet</item>
+    <string-array name="outer_radius">
+        <item>100 feet</item>
+        <item>120 feet</item>
+        <item>140 feet</item>
+        <item>160 feet</item>
+        <item>200 feet</item>
+    </string-array>
+    <string-array name="outer_radius_values">
+        <item>100</item>
+        <item>120</item>
+        <item>140</item>
+        <item>160</item>
+        <item>200</item>
+    </string-array>
+    <string-array name="middle_radius">
+        <item>40 feet</item>
+        <item>45 feet</item>
+        <item>50 feet</item>
+        <item>55 feet</item>
+        <item>60 feet</item>
+    </string-array>
+    <string-array name="middle_radius_values">
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+        <item>55</item>
+        <item>60</item>
+    </string-array>
+    <string-array name="inner_radius">
         <item>15 feet</item>
         <item>20 feet</item>
         <item>25 feet</item>
+        <item>30 feet</item>
+        <item>35 feet</item>
     </string-array>
-    <string-array name="radius_values">
-        <item>5</item>
-        <item>10</item>
+    <string-array name="inner_radius_values">
         <item>15</item>
         <item>20</item>
         <item>25</item>
+        <item>30</item>
+        <item>35</item>
     </string-array>
     <string-array name="general_alarm_level">
         <item>green</item>
@@ -60,4 +88,6 @@
     <string name="instructions">Choose the level of threat of the enemy</string>
     <string name="swipe_to_answer_call">Swipe to answer call</string>
     <string name="fake_caller">Fake caller!</string>
+    <string name="settings">Settings</string>
+    <string name="the_sliding_image_for_the_slider">the sliding image for the slider!</string>
 </resources>

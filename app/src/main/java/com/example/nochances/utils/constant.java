@@ -1,6 +1,12 @@
 package com.example.nochances.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
+
+import com.example.nochances.Services.TrackingService;
+import com.example.nochances.fragments.settingsPrefFragment;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -10,11 +16,10 @@ public class constant {
      * FIELDS: Lots of constants to be used around the app for various utility purposes.
      * Their functionality is self-explanatory by their name
      */
-    public static final int GEOFENCE_RADIUS_IN_METERS = 100;
-    public static final int INNER_RADIUS_IN_METERS = 30;
-    public static final int PHONE_CALL_RADIUS_IN_METERS = 5;
     // there need to be at least 30 location updates before we can call again!
     public static final int FAKE_PHONE_CALL_INTERVAL = 30;
+    // change this to false for privacy in the real app.
+    public static final boolean DBG_APPROACHING_ENEMIES_MARK = false;
 
     public static String md5(final String s) {
         final String MD5 = "MD5";
@@ -108,5 +113,39 @@ public class constant {
             default:
                 return 6;
         }
+    }
+
+    /**
+     * Gives the outer circle radius in meters from the preferences
+     */
+    public static int outerRadiusInMeters(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                (context);
+        int outer_radius_valueFT = Integer.parseInt(preferences.getString(
+                settingsPrefFragment.OUTER_RADIUS,"15")
+                .split(" ")[0]);
+        return (int)(outer_radius_valueFT*0.3);
+    }
+
+    /**
+     * Gives the inner circle radius in meters from the preferences
+     */
+    public static int middleRadiusInMeters(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                (context);
+        int middle_radius_valueFT =Integer.parseInt(preferences.getString(
+                settingsPrefFragment.MIDDLE_RADIUS,"40")
+                .split(" ")[0]);
+        return (int)(middle_radius_valueFT*0.3);
+    }
+
+
+    public static int phoneCallRadiusInMeters(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                (context);
+        int inner_radius_valueFT = Integer.parseInt(preferences.getString(
+                settingsPrefFragment.INNER_RADIUS,"100")
+                .split(" ")[0]);
+        return (int)(inner_radius_valueFT*0.3);
     }
 }
