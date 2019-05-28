@@ -2,25 +2,43 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:title="Application Settings">
+        <RingtonePreference
+            android:defaultValue="Life's Good"
+            android:key="ringtone_preference_1"
+            android:dialogTitle="Set a ringtone for your fake phone calls!"
+            android:title="Ringtone preference" />
         <SwitchPreference
             android:key="isTrackingEnabled"
             android:title="Disable Tracking"
-            android:summary="You can disable or enable tracking"/>
+            android:summary="You can disable or enable tracking" />
         <ListPreference
-            android:dialogTitle="How far do you want your enemies to stay away from you"
-            android:entries="@array/radius"
-            android:entryValues="@array/radius_values"
-            android:key="radius"
-            android:summary="Select the radius to track enemies"
-            android:title="Radius"
-            android:onClick="listpref"/>
+            android:defaultValue="100 feet"
+            android:dialogTitle="How far do you want your enemies to stay away from you?"
+            android:entries="@array/outer_radius"
+            android:entryValues="@array/outer_radius_values"
+            android:key="outer_radius"
+            android:title="Outer Radius" />
         <ListPreference
+            android:defaultValue="40 feet"
+            android:dialogTitle="Once an enemy gets this close, the phone vibrates!"
+            android:entries="@array/middle_radius"
+            android:entryValues="@array/middle_radius_values"
+            android:key="middle_radius"
+            android:title="Vibration Radius" />
+        <ListPreference
+            android:defaultValue="15 feet"
+            android:dialogTitle="If an enemy gets really close, a fake phone call will be sent!"
+            android:entries="@array/inner_radius"
+            android:entryValues="@array/inner_radius_values"
+            android:key="inner_radius"
+            android:title="Fake Phone Call Radius" />
+        <ListPreference
+            android:defaultValue="green"
             android:dialogTitle="How much do you not want to see your enemies"
             android:entries="@array/general_alarm_level"
             android:entryValues="@array/general_alarm_level_values"
             android:key="general_alarm_level"
-            android:summary="general_alarm_level"
-            android:title="general_alarm_level" />
+            android:title="General Alarm Level" />
 
     </PreferenceCategory>
     <PreferenceCategory

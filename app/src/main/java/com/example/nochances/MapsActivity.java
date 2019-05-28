@@ -7,13 +7,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.example.nochances.Model.Intents;
 import com.example.nochances.Services.TrackingService;
+import com.example.nochances.fragments.settingsPrefFragment;
 import com.example.nochances.utils.constant;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -48,13 +49,6 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -82,10 +76,9 @@ public class MapsActivity extends AppCompatActivity
      *  12. circleColor: the color of the inside of the circle, to be decided by the user's
      *  set generalAlarmLevel and the average of the alarm levels of the enemies
      *  13. collectiveAlarmLevel: the average of the alarm levels of the approaching enemies
-     *  14. hasVibratedForOuterCircle: has the phone vibrated because of a violation of
-     *  the general alarm level threshold?
-     *  15. middleCircle: the middle circle in the map
-     *  16. innerCircle: the inner circle in the map
+     *  14. middleCircle: the middle circle in the map
+     *  15. innerCircle: the inner circle in the map
+     *  16. sharedPreferences: a preferences object for this current user in this app!
      */
     private static final int LOCATION_PERMISSION_ACCESS = 1;
     private static final String TAG = "TagMapsActivity";
@@ -133,8 +126,8 @@ public class MapsActivity extends AppCompatActivity
     private ArrayList<Marker> enemyMarkers = new ArrayList<>();
     private int circleColor;
     private int collectiveAlarmLevel;
-    private boolean hasVibratedForOuterCircle;
     private Circle middleCircle, innerCircle;
+    private SharedPreferences sharedPreferences;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -143,17 +136,19 @@ public class MapsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle(R.string.title_activity_maps);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.title_activity_maps);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // initially, the phone has not vibrated!
-        hasVibratedForOuterCircle = false;
+        // initially the circle color is green
+        circleColor = constant.valueToAlarmLevelColor(1);
+
+        // initialize shared preferences
+        sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(MapsActivity.this);
 
         // check if we have permissions for location access and if not request them.
         checkPermissions();
@@ -193,7 +188,8 @@ public class MapsActivity extends AppCompatActivity
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // start the TrackingService if it isn't running alraedy
-            if (!TrackingService.isRunning) {
+            if (!TrackingService.isRunning && !sharedPreferences.getBoolean(
+                    settingsPrefFragment.ENABLE_TRACKING, false)) {
                 startForegroundService(new Intent(MapsActivity.this, TrackingService.class));
             }
             // bind to the TrackingService
@@ -245,7 +241,8 @@ public class MapsActivity extends AppCompatActivity
                     LOCATION_PERMISSION_ACCESS);
         } else {
             // start the TrackingService if it isn't running alraedy
-            if(!TrackingService.isRunning) {
+            if(!TrackingService.isRunning && !sharedPreferences.getBoolean(
+                    settingsPrefFragment.ENABLE_TRACKING, false)) {
                 startForegroundService(new Intent(MapsActivity.this, TrackingService.class));
             }
             // bind to the TrackingService
@@ -286,9 +283,8 @@ public class MapsActivity extends AppCompatActivity
                     // see where they are in the map and just that!
                     getCurrentLocation();
                     // start the TrackingService if the service isn't already running!
-                    if (!TrackingService.isRunning) {
-                        // TODO: Make sure to call StopForeground somehow! Then we'll see if
-                        // TODO: the notification changes to what we want!
+                    if (!TrackingService.isRunning && !sharedPreferences.getBoolean(
+                            settingsPrefFragment.ENABLE_TRACKING, false)) {
                         startForegroundService(new Intent(MapsActivity.this, TrackingService.class));
                     }
                     // bind to the TrackingService
@@ -369,13 +365,20 @@ public class MapsActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.EnemiesList) {
+            try {
+                // unbind from service!
+                doUnbindService();
+            } catch (Throwable t) {
+                // if we fail to unbind, issue a warning!
+                Log.w(TAG, "Failed to unbind from service!");
+            }
             Intent intent = Intents.MapsActivityToEnemiesList(MapsActivity.this);
             startActivity(intent);
             return true;
         }
-        if(id == android.R.id.home) {
-            finish();
-            return true;
+        if(id == R.id.settings) {
+            Intent i = Intents.MapsActivityToSettingsActivity(MapsActivity.this);
+            startActivity(i);
         }
         if(id==R.id.EditProfile){
             startActivity(RegisterIntent(MapsActivity.this, true));
@@ -409,6 +412,7 @@ public class MapsActivity extends AppCompatActivity
                 if(current_location != null) {
                     LatLng current_lat_lng = new LatLng(current_location.getLatitude(),
                             current_location.getLongitude());
+
                     updateMap(current_lat_lng);
                 }
             } else {
@@ -456,7 +460,7 @@ public class MapsActivity extends AppCompatActivity
                 .center(locationLatLng)
                 .strokeColor(Color.argb(50, 70,70,70))
                 .fillColor(circleColor)
-                .radius(constant.GEOFENCE_RADIUS_IN_METERS );
+                .radius(constant.outerRadiusInMeters(this) );
         // TODO: modify strokeColor a bit too!
         // add the circle to the map!
         geoFenceLimits = mMap.addCircle( OuterCircleOptions );
@@ -470,7 +474,7 @@ public class MapsActivity extends AppCompatActivity
                 .center(locationLatLng)
                 .strokeColor(Color.rgb(0,0,0))
                 .fillColor(circleColor)
-                .radius(constant.INNER_RADIUS_IN_METERS);
+                .radius(constant.middleRadiusInMeters(this));
         middleCircle = mMap.addCircle(MiddleCircleOptions);
 
         if( innerCircle != null)
@@ -480,7 +484,7 @@ public class MapsActivity extends AppCompatActivity
                 .center(locationLatLng)
                 .strokeColor(Color.rgb(0,0,0))
                 .fillColor(circleColor)
-                .radius(constant.PHONE_CALL_RADIUS_IN_METERS);
+                .radius(constant.phoneCallRadiusInMeters(this));
         innerCircle = mMap.addCircle(PhoneCallCircleOptions);
 
     }
@@ -546,8 +550,7 @@ public class MapsActivity extends AppCompatActivity
                         // and update our map!
                         updateMap(new LatLng(newLatLng[0], newLatLng[1]));
                     }
-                    // TODO: for 'official' app, take away this feature maybe
-                    if(approachingEnemiesLocations != null) {
+                    if(constant.DBG_APPROACHING_ENEMIES_MARK && approachingEnemiesLocations != null) {
                         markApproachingEnemies(approachingEnemiesLocations);
                     }
                     // do we have to issue a fake phone call?
@@ -602,54 +605,30 @@ public class MapsActivity extends AppCompatActivity
      * @return: the color the inside of the circle will be painted with.
      */
     private void circleInsideAlarmColor() {
-        // get the current user and their e-mail (we are being defensive here)
-        FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
-        if (current_user != null && current_user.getEmail() != null) {
-            // from database, go the the user's preferences are read off
-            // their general alarm level
-            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            DatabaseReference settingsRef = firebaseDatabase.getReference("users_" +
-                    constant.md5(current_user.getEmail()) + "/preferences/alarm_level");
-            settingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String generalAlarmLevelStringColor = dataSnapshot.getValue(String.class);
-                    if (generalAlarmLevelStringColor != null) {
-                        // turn the general alarm level color into an integer value
-                        // refer to the documentation of generalAlarmLevelToValue for details
-                        int generalAlarmLevel = constant.generalAlarmLevelToValue
-                                (generalAlarmLevelStringColor);
+        // get the general alarm level of the user through the preferences!
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MapsActivity.this);
+        String generalAlarmLevelStringColor = sharedPreferences.getString("general_alarm_level", "green");
+        // turn the general alarm level color into an integer value
+        // refer to the documentation of generalAlarmLevelToValue for details
+        int generalAlarmLevel = constant.generalAlarmLevelToValue
+                (generalAlarmLevelStringColor);
+        if (generalAlarmLevel == -1) {
+            // is case something went wrong in feeding the string to
+            // generalAlarmLevelToValue, then that function will return -1
+            // and so the color we set the inside of the circle will be grayish.
+            circleColor = Color.argb(100, 150, 150, 150);
+        }
+        // the general alarm level acts as a threshold in a reverse way:
+        // if its, let's say RED, then it has the value 0, so anything
+        // triggers it. If it's green, then nothing does.
+        // the alarm level of our enemies exceeds our threshold, then we
+        // have to color the circle the color of that collective alarm level.
+        if (collectiveAlarmLevel > generalAlarmLevel) {
 
-                        if (generalAlarmLevel == -1) {
-                            // is case something went wrong in feeding the string to
-                            // generalAlarmLevelToValue, then that function will return -1
-                            // and so the color we set the inside of the circle will be grayish.
-                            circleColor = Color.argb(100, 150, 150, 150);
-                        }
-
-                        // the general alarm level acts as a threshold in a reverse way:
-                        // if its, let's say RED, then it has the value 0, so anything
-                        // triggers it. If it's green, then nothing does.
-
-                        // the alarm level of our enemies exceeds our threshold, then we
-                        // have to color the circle the color of that collective alarm level.
-                        if (collectiveAlarmLevel > generalAlarmLevel) {
-                            circleColor = constant.valueToAlarmLevelColor(collectiveAlarmLevel);// if it is the first time we exceed this threshold...
-                            if(!hasVibratedForOuterCircle) {
-                                hasVibratedForOuterCircle = true;
-                            }
-                        } else if(collectiveAlarmLevel == 0) {
-                            // if there are no enemies in the outer circle, then color it green!
-                            circleColor = constant.valueToAlarmLevelColor(1); // green
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+            circleColor = constant.valueToAlarmLevelColor(collectiveAlarmLevel);// if it is the first time we exceed this threshold...
+        } else if(collectiveAlarmLevel == 0) {
+            // if there are no enemies in the outer circle, then color it green!
+            circleColor = constant.valueToAlarmLevelColor(1); // green
         }
     }
 
@@ -657,6 +636,7 @@ public class MapsActivity extends AppCompatActivity
      * Vibrates the phone when the general alarm level gets breached!
      */
     private void vibratePhone(){
+        Log.d(TAG, "vibratePhone()");
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 1000 milliseconds = 1 second
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -672,17 +652,16 @@ public class MapsActivity extends AppCompatActivity
     }
 
     /**
-     * Issues a fake call by:
-     *      1) Playing the ringtone.
-     *      2) Sending user to the FakePhoneCall screen
+     * Issues a fake call by unbinding from the service! Then the service will take care
+     * of issuing the call! A small delay in that happening might occur!
      */
     private void fakeCall(){
-        // play ringtone
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-        r.play();
-
-        Intent intent = Intents.MapsActivityToFakePhoneCall(MapsActivity.this);
-        startActivity(intent);
+        try {
+            // unbind from service!
+            doUnbindService();
+        } catch (Throwable t) {
+            // if we fail to unbind, issue a warning!
+            Log.w(TAG, "Failed to unbind from service!");
+        }
     }
 }

@@ -10,6 +10,7 @@
         android:layout_width="77dp"
         android:layout_height="62dp"
         android:src="@drawable/answer_call"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/the_sliding_image_for_the_slider" />
 
 </RelativeLayout>
