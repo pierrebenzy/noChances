@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.nochances.Model.Intents;
+import com.example.nochances.Services.TrackingService;
 import com.example.nochances.utils.ImageTouchSlider;
 
 public class FakePhoneCall extends AppCompatActivity {
@@ -19,6 +20,9 @@ public class FakePhoneCall extends AppCompatActivity {
 
             @Override
             public void onChanged() {
+                // stop the ringtone
+                TrackingService.ringtone.stop();
+                // go to map activity!
                 Intent intent = Intents.FakePhoneCallToMapsActivity(FakePhoneCall.this);
                 startActivity(intent);
             }

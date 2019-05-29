@@ -21,7 +21,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/fake_caller"
         android:cropToPadding="true"
-        android:src="@drawable/jim_round" />
+        android:src="@drawable/ic_launcher_round" />
 
 
     <com.example.nochances.utils.ImageTouchSlider

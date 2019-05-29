@@ -94,6 +94,7 @@ public class TrackingService extends Service {
      *      issue a fake phone call again?
      *      23. MAKE_PHONE_CALL: code for telling the client that a fake phone call needs
      *      to be initiated.
+     *      24. ringtone: a ringtone playing!
      */
     private static final String TAG = "TrackingService";
     private final Messenger serverReceiver = new Messenger(new IncomingMessageHandler());
@@ -116,6 +117,7 @@ public class TrackingService extends Service {
     private boolean phoneCall;
     private int locationUpdatesUntilPhoneCall;
     public static final String MAKE_PHONE_CALL = "make fake phone call|!";
+    public static Ringtone ringtone;
 
     /**
      * Basic Service Methods:
@@ -377,7 +379,7 @@ public class TrackingService extends Service {
                 criteria.setCostAllowed(true);
                 String provider = locationManager.getBestProvider(criteria, true);
                 // now start listening for location updates
-                locationManager.requestLocationUpdates(provider, 3000, 5,
+                locationManager.requestLocationUpdates(provider, 2000, 2,
                         locationListener);
             } else {
                 // issue appropriate warning!
@@ -574,8 +576,8 @@ public class TrackingService extends Service {
                                                 (TrackingService.this);
         Uri notification = Uri.parse(sharedPreferences.getString
                                 (settingsPrefFragment.RINGTONE_PREFERENCE, "Life's Good"));
-        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-        r.play();
+        ringtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        ringtone.play();
         Intent i = new Intent(this, FakePhoneCall.class);
         i.setAction(Intent.ACTION_MAIN);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
