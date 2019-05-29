@@ -2,11 +2,24 @@ package com.example.nochances.Model;
 
 
 public class enemiesAlarmLevel {
+
     private String name;
     private String color;
     private String email;
     private boolean deleted;
     private boolean inInner;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public boolean isInInner() {
         return inInner;
