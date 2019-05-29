@@ -26,46 +26,46 @@
     <string name="enemies">Enemies</string>
     <string name="users">Users</string>
     <string-array name="outer_radius">
+        <item>200 feet</item>
+        <item>220 feet</item>
+        <item>240 feet</item>
+        <item>260 feet</item>
+        <item>300 feet</item>
+    </string-array>
+    <string-array name="outer_radius_values">
+        <item>200</item>
+        <item>220</item>
+        <item>240</item>
+        <item>260</item>
+        <item>300</item>
+    </string-array>
+    <string-array name="middle_radius">
         <item>100 feet</item>
         <item>120 feet</item>
         <item>140 feet</item>
+        <item>150 feet</item>
         <item>160 feet</item>
-        <item>200 feet</item>
     </string-array>
-    <string-array name="outer_radius_values">
+    <string-array name="middle_radius_values">
         <item>100</item>
         <item>120</item>
         <item>140</item>
+        <item>150</item>
         <item>160</item>
-        <item>200</item>
-    </string-array>
-    <string-array name="middle_radius">
-        <item>40 feet</item>
-        <item>45 feet</item>
-        <item>50 feet</item>
-        <item>55 feet</item>
-        <item>60 feet</item>
-    </string-array>
-    <string-array name="middle_radius_values">
-        <item>40</item>
-        <item>45</item>
-        <item>50</item>
-        <item>55</item>
-        <item>60</item>
     </string-array>
     <string-array name="inner_radius">
-        <item>15 feet</item>
-        <item>20 feet</item>
-        <item>25 feet</item>
-        <item>30 feet</item>
-        <item>35 feet</item>
+        <item>50 feet</item>
+        <item>60 feet</item>
+        <item>70 feet</item>
+        <item>80 feet</item>
+        <item>90 feet</item>
     </string-array>
     <string-array name="inner_radius_values">
-        <item>15</item>
-        <item>20</item>
-        <item>25</item>
-        <item>30</item>
-        <item>35</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
     </string-array>
     <string-array name="general_alarm_level">
         <item>green</item>

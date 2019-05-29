@@ -122,7 +122,7 @@ public class constant {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
         int outer_radius_valueFT = Integer.parseInt(preferences.getString(
-                settingsPrefFragment.OUTER_RADIUS,"15")
+                settingsPrefFragment.OUTER_RADIUS,"50")
                 .split(" ")[0]);
         return (int)(outer_radius_valueFT*0.3);
     }
@@ -134,7 +134,7 @@ public class constant {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
         int middle_radius_valueFT =Integer.parseInt(preferences.getString(
-                settingsPrefFragment.MIDDLE_RADIUS,"40")
+                settingsPrefFragment.MIDDLE_RADIUS,"100")
                 .split(" ")[0]);
         return (int)(middle_radius_valueFT*0.3);
     }
@@ -144,7 +144,7 @@ public class constant {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
         int inner_radius_valueFT = Integer.parseInt(preferences.getString(
-                settingsPrefFragment.INNER_RADIUS,"100")
+                settingsPrefFragment.INNER_RADIUS,"200")
                 .split(" ")[0]);
         return (int)(inner_radius_valueFT*0.3);
     }

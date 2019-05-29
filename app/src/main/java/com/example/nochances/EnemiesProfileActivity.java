@@ -243,9 +243,9 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         // get the path to the right user
         String emailHash=constant.md5(FirebaseAuth.getInstance().getCurrentUser().getEmail());
         //enemies_state is a model that contains the enemy Email, color, is it deleted?
-        database.child("users_"+emailHash).child("enemies_list").child(constant.md5(enemyEmail)).
-                setValue(new enemiesAlarmLevel(enemyName, ColorSelectedString,enemyEmail,false,false)).
-                addOnCompleteListener(new OnCompleteListener<Void>() {
+        database.child("users_"+emailHash).child("enemies_list").child(constant.md5(enemyEmail))
+                .setValue(new enemiesAlarmLevel(enemyName, ColorSelectedString,enemyEmail,false, false))
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(EnemiesProfileActivity.this,"enemy successfully added",

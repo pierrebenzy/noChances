@@ -25,4 +25,17 @@ This document will contain information about high-level code management, known i
 ### Known Problems
 1. When some enemy gets out of the outer circle, it might take a few iterations of location requests to make it so that the color of the circle changes successfully. During those iterations, maybe the color will be wrong even if the enemy is out of the circle! The reason why this happens is because it takes some time to receive a new location update so the color of the circle remains the same during that time!
 2. Right now, logging out kills the persistent service but leaves some other instance of it open. That instance doesn't do anything other than update locations, so it really is useless. We just cannot find a decent way to kill it yet.
-3. Unknown server issue with Firebase. Seems to be caused by phone or it might be an admitted bug. Prevents us from getting the pictures of the profiles.
+3. Unknown server issue with Firebase. Seems to be caused by phone or it might be an admitted bug. Prevents us from getting the pictures of the profiles. FIX: make a new e-mail and firebase account.
+4. Unfortunately, the GPS updates on some phones are weak indoors. The app has been tested and it worksoutdoors but there is slow reaction time indoors (if any). Our app heavily relies on GPS location updates and therefore it can be characterized by general inactivity when we are indoors. To fix this in the DEMO, we tried to use FakeGPS, an app which triggers minimal location updates towards random directions.
+5. Another problem that we weren't able to fix was stopping the ringtone after the fake call ends. On most of our tests, the ringtones did indeed stop after some short interval but not immediately. We did not have time to investigate.
+6. Potential crashes at sign-out. We spotted this last minute and did not have time to figure out when it happens or what causes it.
+
+
+### Future additions
+1. Bluetooth or WiFi location detection to compensate for the weakness of GPS indoors.
+2. Leaderboard and statistics activities / fragments.
+3. Slightly more elegant and straightforward UI and better anonymity encryption.
+4. Fix the bugs above.
+
+### IMPORTANT
+To turn off the feature of being able to see one's enemies inside the outer circle, please set the variable ``DBG_APPROACHING_ENEMIES_MARK`` to false in ``utils/constant``. Officially, the app would have that feature turned off for the sake of anonymity but we use it for debugging.
