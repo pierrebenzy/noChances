@@ -1,6 +1,8 @@
 package com.example.nochances;
 
 
+import android.app.ActionBar;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import com.example.nochances.adapter.ListActivityPagerAdapter;
@@ -8,8 +10,10 @@ import com.example.nochances.fragments.*;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -26,6 +30,11 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackground(new ColorDrawable(getResources().getColor(R.color.light_orange)));
+        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);

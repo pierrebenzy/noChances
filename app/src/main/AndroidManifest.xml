@@ -17,7 +17,7 @@
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/nochances_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -43,10 +43,14 @@
             android:name=".Services.TrackingService"
             tools:ignore="InnerclassSeparator" />
         <activity android:name=".Register"
-            android:configChanges="orientation"/>
-        <activity android:name=".ListActivity" />
+            android:configChanges="orientation"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".ListActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".settings_activity" />
-        <activity android:name=".EnemiesProfileActivity"/>
+        <activity android:name=".EnemiesProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".signInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
