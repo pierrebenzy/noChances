@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "326100608810",
-    "firebase_url": "https://nochancesrealapp-d3a66.firebaseio.com",
-    "project_id": "nochancesrealapp-d3a66",
-    "storage_bucket": "nochancesrealapp-d3a66.appspot.com"
+    "project_number": "41691877936",
+    "firebase_url": "https://nochances-d94ff.firebaseio.com",
+    "project_id": "nochances-d94ff",
+    "storage_bucket": "nochances-d94ff.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:326100608810:android:ef3147b4312dcf0e",
+        "mobilesdk_app_id": "1:41691877936:android:ef3147b4312dcf0e",
         "android_client_info": {
           "package_name": "com.example.nochances"
         }
       },
       "oauth_client": [
         {
-          "client_id": "326100608810-1m6l742a3vq0fo9rkabvr1uvo2opuiln.apps.googleusercontent.com",
+          "client_id": "41691877936-gr6hco2ooc5svd820j1r3m3nhrp9qtj3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB9Dl9VBHueKTbJnFCbEzmn3Pxd7pJtviE"
+          "current_key": "AIzaSyCtSYp2dWIp4nygiMe_NGc2ey3xtxUDrjM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "326100608810-1m6l742a3vq0fo9rkabvr1uvo2opuiln.apps.googleusercontent.com",
+              "client_id": "41691877936-gr6hco2ooc5svd820j1r3m3nhrp9qtj3.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
