@@ -9,6 +9,7 @@
     <color name="green">#00FF00</color>
     <color name="blue">#3a7bd5</color>
     <color name="light_yellow">#f0cb35</color>
+    <color name="light_orange">#f56217</color>
 
     <array name="color">
     <item>@color/red</item>

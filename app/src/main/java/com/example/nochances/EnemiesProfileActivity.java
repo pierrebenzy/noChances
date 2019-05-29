@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,6 +72,12 @@ public class EnemiesProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.enemies_profile);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackground(new ColorDrawable(getResources().getColor(R.color.light_orange)));
+        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
+
         seekBar=findViewById(R.id.SeekBar);
         mName=findViewById(R.id.name);
         mEmail=findViewById(R.id.email);
@@ -236,7 +244,7 @@ public class EnemiesProfileActivity extends AppCompatActivity {
         String emailHash=constant.md5(FirebaseAuth.getInstance().getCurrentUser().getEmail());
         //enemies_state is a model that contains the enemy Email, color, is it deleted?
         database.child("users_"+emailHash).child("enemies_list").child(constant.md5(enemyEmail)).
-                setValue(new enemiesAlarmLevel(enemyName, ColorSelectedString,enemyEmail,false)).
+                setValue(new enemiesAlarmLevel(enemyName, ColorSelectedString,enemyEmail,false,false)).
                 addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {

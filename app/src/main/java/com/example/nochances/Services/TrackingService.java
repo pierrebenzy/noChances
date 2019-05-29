@@ -379,7 +379,7 @@ public class TrackingService extends Service {
                 criteria.setCostAllowed(true);
                 String provider = locationManager.getBestProvider(criteria, true);
                 // now start listening for location updates
-                locationManager.requestLocationUpdates(provider, 2000, 2,
+                locationManager.requestLocationUpdates(provider, 1000, 1,
                         locationListener);
             } else {
                 // issue appropriate warning!

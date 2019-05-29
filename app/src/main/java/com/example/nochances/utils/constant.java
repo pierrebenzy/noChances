@@ -19,7 +19,7 @@ public class constant {
     // there need to be at least 30 location updates before we can call again!
     public static final int FAKE_PHONE_CALL_INTERVAL = 30;
     // change this to false for privacy in the real app.
-    public static final boolean DBG_APPROACHING_ENEMIES_MARK = false;
+    public static final boolean DBG_APPROACHING_ENEMIES_MARK = true;
 
     public static String md5(final String s) {
         final String MD5 = "MD5";
