@@ -155,9 +155,9 @@ public class signInActivity extends AppCompatActivity {
                             editor.apply();
                         } else {
                             editor.putString(RINGTONE_PREFERENCE, "Life's Good");
-                            editor.putString(INNER_RADIUS, "10 feet");
-                            editor.putString(MIDDLE_RADIUS, "40 feet");
-                            editor.putString(OUTER_RADIUS, "100 feet");
+                            editor.putString(INNER_RADIUS, "50 feet");
+                            editor.putString(MIDDLE_RADIUS, "100 feet");
+                            editor.putString(OUTER_RADIUS, "200 feet");
                             editor.putString(GENERAL_ALARM_LEVEL, "green");
                             editor.putBoolean(ENABLE_TRACKING, true);
                             editor.apply();

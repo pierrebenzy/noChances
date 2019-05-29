@@ -51,11 +51,6 @@ import java.util.ArrayList;
 
 public class TrackingService extends Service {
 
-    /*
-     * TODOs
-     * TODO: how to disable tracking, i.e. stop listener from receiving location updates?
-     */
-
     /** FIELDS
      *      1. TAG: tag for debugging
      *      2. serverReceiver: a receiver that will receive messages from clients
@@ -121,10 +116,10 @@ public class TrackingService extends Service {
 
     /**
      * Basic Service Methods:
-     *      1. Constructor: TODO: should it contain something?
-     *      2. onCreate(): TODO: Does it do anything?
-     *      3. onDestroy(): TODO: Should it do anything?
-     *      4. onStartCommand(): Don't forget to START_STICKY! TODO: Does it do anything else?
+     *      1. Constructor
+     *      2. onCreate()
+     *      3. onDestroy()
+     *      4. onStartCommand(): Don't forget to START_STICKY!
      *      5. onBind(): return the binder to the serverReceiver
      */
     public TrackingService() {
@@ -170,7 +165,6 @@ public class TrackingService extends Service {
                 } else {
                     Log.d(TAG, "serverSender is null when trying to notify of location changes!");
                     if(phoneCall) {
-                        // TODO: make the fake phone call when the app is sleeping or off-focus or turned-off!
                         fakeCall();
                     }
                 }
@@ -379,7 +373,7 @@ public class TrackingService extends Service {
                 criteria.setCostAllowed(true);
                 String provider = locationManager.getBestProvider(criteria, true);
                 // now start listening for location updates
-                locationManager.requestLocationUpdates(provider, 2000, 2,
+                locationManager.requestLocationUpdates(provider, 1000, 1,
                         locationListener);
             } else {
                 // issue appropriate warning!
@@ -524,9 +518,7 @@ public class TrackingService extends Service {
 
     /**
      * Displays a notification which informs the user that their location is being monitored by
-     * the app and that if they don't want that anymore they can either:
-     *      1) TODO: Disable that from the settings (app becomes useless then)
-     *      2) log out
+     * the app.
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private Notification buildPersistentNotification() {

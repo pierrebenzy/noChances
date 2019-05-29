@@ -461,7 +461,6 @@ public class MapsActivity extends AppCompatActivity
                 .strokeColor(Color.argb(50, 70,70,70))
                 .fillColor(circleColor)
                 .radius(constant.outerRadiusInMeters(this) );
-        // TODO: modify strokeColor a bit too!
         // add the circle to the map!
         geoFenceLimits = mMap.addCircle( OuterCircleOptions );
 
@@ -536,7 +535,6 @@ public class MapsActivity extends AppCompatActivity
                     // alarm level threshold
                     circleInsideAlarmColor();
                     // has someone entered the inner circle for the first time?
-                    // TODO: add inner vs outer circle in preferences!
                     boolean enemyInInnerCircleForTheFirstTime = msg.getData().getBoolean
                             (TrackingService.INNER_CIRCLE_ENTRY);
                     // get if an enemy has entered the inner circle for the first time

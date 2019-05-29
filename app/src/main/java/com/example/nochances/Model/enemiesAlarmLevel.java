@@ -6,6 +6,7 @@ public class enemiesAlarmLevel {
     private String color;
     private String email;
     private boolean deleted;
+    private boolean inInner;
 
 
     public boolean isDeleted() {
@@ -43,6 +44,14 @@ public class enemiesAlarmLevel {
         this.deleted=deleted;
     }
 
+    public enemiesAlarmLevel(String name, String color, String email, boolean deleted, boolean inInner) {
+        this.name=name;
+        this.color=color;
+        this.email=email;
+        this.deleted=deleted;
+        this.inInner=inInner;
+    }
+
     public void setColor(String color) {
         this.color = color;
     }
@@ -53,5 +62,13 @@ public class enemiesAlarmLevel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isInInner() {
+        return inInner;
+    }
+
+    public void setInInner(boolean inInner) {
+        this.inInner = inInner;
     }
 }
