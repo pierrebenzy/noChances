@@ -22,8 +22,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:fadingEdge="vertical"
-        app:itemIconTint="@color/light_yellow"
-        app:itemTextColor="@color/light_yellow"
+        app:itemIconTint="@drawable/bottom_nav_colors"
+        app:itemTextColor="@drawable/bottom_nav_colors"
         app:menu="@menu/navigations_items"
         />
 
