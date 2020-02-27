@@ -39,3 +39,4 @@ This document will contain information about high-level code management, known i
 
 ### IMPORTANT
 To turn off the feature of being able to see one's enemies inside the outer circle, please set the variable ``DBG_APPROACHING_ENEMIES_MARK`` to false in ``utils/constant``. Officially, the app would have that feature turned off for the sake of anonymity but we use it for debugging.
+# noChances
